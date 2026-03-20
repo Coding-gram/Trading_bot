@@ -14,6 +14,12 @@ cp .env.example .env
 # Edit .env with your Binance API keys & Telegram bot token
 ```
 
+If your hosting region is blocked on binance.com (HTTP 451), set exchange override in env:
+```bash
+EXCHANGE_ID=binanceus
+```
+Use this only if your account and symbols are compatible with Binance US.
+
 ### 3. Run in Paper Mode (Simulation – START HERE)
 ```bash
 python -m bot.main --mode paper
