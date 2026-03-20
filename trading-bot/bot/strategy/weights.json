@@ -1,0 +1,14 @@
+{
+  "trend_alignment": 20,
+  "macd_signal": 15,
+  "rsi_zone": 15,
+  "candlestick_pattern": 15,
+  "chart_pattern": 15,
+  "volume_confirm": 10,
+  "sr_proximity": 10,
+  "adx_strength": 10,
+  "stochastic": 8,
+  "obv_confirm": 7,
+  "bb_signal": 8,
+  "vwap_bias": 7
+}

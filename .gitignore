@@ -1,0 +1,26 @@
+# Secrets
+trading-bot/.env
+
+# Python cache/artifacts
+**/__pycache__/
+**/*.py[cod]
+
+# Logs and local runtime files
+trading-bot/bot.log
+*.log
+
+# Local databases
+trading-bot/*.db
+*.db
+
+# Local environments
+.venv/
+venv/
+
+# Node modules (dashboard)
+**/node_modules/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
