@@ -10,7 +10,7 @@ load_dotenv()
 # ─── Exchange ─────────────────────────────────────────────────────────────────
 BINANCE_API_KEY = os.getenv("BINANCE_API_KEY", "")
 BINANCE_API_SECRET = os.getenv("BINANCE_API_SECRET", "")
-EXCHANGE_ID = os.getenv("EXCHANGE_ID", "binance").strip().lower()
+EXCHANGE_ID = "binance"
 
 # ─── Trading Mode ─────────────────────────────────────────────────────────────
 # "paper"  → simulation, no real money
