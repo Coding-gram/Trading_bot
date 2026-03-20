@@ -19,6 +19,7 @@ venv/
 
 # Node modules (dashboard)
 **/node_modules/
+**/.next/
 
 # OS/editor noise
 .DS_Store
