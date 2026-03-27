@@ -1,0 +1,52 @@
+{
+  "created_at_utc": "2026-03-21T14:17:59.918052+00:00",
+  "results": [
+    {
+      "symbol": "BTC/USDT",
+      "score": 0,
+      "direction": "neutral",
+      "send_alert": false,
+      "details": {}
+    },
+    {
+      "symbol": "ETH/USDT",
+      "score": 0,
+      "direction": "neutral",
+      "send_alert": false,
+      "details": {}
+    },
+    {
+      "symbol": "BNB/USDT",
+      "score": 0,
+      "direction": "neutral",
+      "send_alert": false,
+      "details": {}
+    },
+    {
+      "symbol": "SOL/USDT",
+      "score": 28,
+      "direction": "long",
+      "send_alert": false,
+      "details": {
+        "trend": "+10 (partial bull alignment)",
+        "stochastic": "+4 (stoch bullish cross K=39.7)",
+        "candle_pattern": "+7 (bullish candle pattern x1)",
+        "vwap": "+7 (price > VWAP)"
+      }
+    },
+    {
+      "symbol": "ADA/USDT",
+      "score": 0,
+      "direction": "neutral",
+      "send_alert": false,
+      "details": {}
+    },
+    {
+      "symbol": "XRP/USDT",
+      "score": 0,
+      "direction": "neutral",
+      "send_alert": false,
+      "details": {}
+    }
+  ]
+}

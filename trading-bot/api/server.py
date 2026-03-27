@@ -3,10 +3,18 @@ FastAPI backend – exposes bot stats & trade history to the dashboard.
 Run with: uvicorn api.server:app --reload --port 8000
 """
 import sqlite3
+import json
+from datetime import datetime, timezone
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from bot.config import DB_PATH, TOTAL_CAPITAL_USDT
+from bot.config import (
+    DB_PATH,
+    TOTAL_CAPITAL_USDT,
+    DASHBOARD_ONLY_CURRENT_SESSION,
+    AUTO_WEIGHT_FEEDBACK_ENABLED,
+)
 from bot import telemetry
+from bot.strategy.performance_tracker import PerformanceTracker
 
 app = FastAPI(title="Trading Bot API")
 
@@ -16,6 +24,59 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+_API_STARTED_AT_UTC = datetime.now(timezone.utc)
+
+
+def _get_latest_telemetry_event_value(metric: str):
+    """Read the latest telemetry event value for a metric directly from DB.
+
+    Needed because API and bot run in separate processes.
+    """
+    if not table_exists("telemetry_events"):
+        return None
+    rows = query_db(
+        """
+        SELECT value_json, created_at
+        FROM telemetry_events
+        WHERE metric = ?
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (metric,),
+    )
+    if not rows:
+        return None
+    value_json = rows[0].get("value_json")
+    if value_json in (None, ""):
+        return rows[0].get("created_at")
+    try:
+        return json.loads(value_json)
+    except Exception:
+        return value_json
+
+
+def _dashboard_session_start_utc() -> datetime:
+    """Resolve session start for dashboard filtering.
+
+    Prefer bot scan-session start when available; otherwise fall back to API start.
+    """
+    session_start = _API_STARTED_AT_UTC
+    try:
+        event_value = _get_latest_telemetry_event_value("bot_session_started_at")
+        parsed = _parse_trade_time(event_value)
+        if parsed is None:
+            snap = telemetry.snapshot()
+            event = (snap.get("last_event") or {}).get("bot_session_started_at")
+            if isinstance(event, dict):
+                parsed = _parse_trade_time(event.get("value") or event.get("at"))
+            else:
+                parsed = _parse_trade_time(event)
+        if parsed is not None and parsed > session_start:
+            session_start = parsed
+    except Exception:
+        pass
+    return session_start
 
 
 def query_db(sql: str, params=()):
@@ -35,7 +96,59 @@ def table_exists(name: str) -> bool:
     return bool(rows)
 
 
-def get_closed_trades(limit: int | None = None):
+def _parse_trade_time(value):
+    if value in (None, ""):
+        return None
+
+    text = str(value).strip()
+    if not text:
+        return None
+
+    normalized = text.replace("Z", "+00:00")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        parsed = None
+        for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S"):
+            try:
+                parsed = datetime.strptime(text, fmt)
+                break
+            except ValueError:
+                continue
+        if parsed is None:
+            return None
+
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _filter_to_current_session(rows: list[dict], close_key: str, open_key: str):
+    if not DASHBOARD_ONLY_CURRENT_SESSION:
+        return rows
+
+    session_start = _dashboard_session_start_utc()
+    filtered = []
+    for row in rows:
+        ts = _parse_trade_time(row.get(close_key) or row.get(open_key))
+        if ts is not None and ts >= session_start:
+            filtered.append(row)
+    return filtered
+
+
+def _normalize_mode(mode: str | None) -> str:
+    normalized = str(mode or "all").strip().lower()
+    return normalized if normalized in {"all", "paper", "live"} else "all"
+
+
+def _filter_rows_by_mode(rows: list[dict], mode: str | None):
+    resolved = _normalize_mode(mode)
+    if resolved == "all":
+        return rows
+    return [row for row in rows if str(row.get("mode") or "").lower() == resolved]
+
+
+def get_closed_trades(limit: int | None = None, mode: str | None = "all"):
     rows = []
     if table_exists("paper_trades"):
         rows.extend(
@@ -83,11 +196,13 @@ def get_closed_trades(limit: int | None = None):
                 """
             )
         )
+    rows = _filter_to_current_session(rows, close_key="close_time", open_key="open_time")
+    rows = _filter_rows_by_mode(rows, mode)
     rows.sort(key=lambda r: r.get("close_time") or r.get("open_time") or "", reverse=True)
     return rows[:limit] if limit is not None else rows
 
 
-def get_open_positions_all():
+def get_open_positions_all(mode: str | None = "all"):
     rows = []
     if table_exists("paper_trades"):
         rows.extend(
@@ -133,14 +248,16 @@ def get_open_positions_all():
                 """
             )
         )
+    rows = _filter_rows_by_mode(rows, mode)
     rows.sort(key=lambda r: r.get("open_time") or "", reverse=True)
     return rows
 
 
 @app.get("/api/stats")
-def get_stats():
+def get_stats(mode: str = "all"):
     """Get aggregate trading statistics across paper+live closed trades."""
-    rows = get_closed_trades()
+    resolved_mode = _normalize_mode(mode)
+    rows = get_closed_trades(mode=resolved_mode)
     if not rows:
         return {
             "total": 0,
@@ -150,6 +267,7 @@ def get_stats():
             "total_pnl": 0,
             "paper_total": 0,
             "live_total": 0,
+            "mode": resolved_mode,
         }
 
     wins = [r for r in rows if (r.get("pnl") or 0) > 0]
@@ -166,42 +284,43 @@ def get_stats():
         "total_pnl": round(sum(r.get("pnl") or 0 for r in rows), 2),
         "paper_total": paper_total,
         "live_total": live_total,
+        "mode": resolved_mode,
     }
 
 
 @app.get("/api/trades")
-def get_trades(limit: int = 50):
+def get_trades(limit: int = 50, mode: str = "all"):
     """Get recent closed trade history across paper+live."""
-    return get_closed_trades(limit=max(1, int(limit or 50)))
+    return get_closed_trades(limit=max(1, int(limit or 50)), mode=_normalize_mode(mode))
 
 
 @app.get("/api/open")
-def get_open():
+def get_open(mode: str = "all"):
     """Get currently open positions across paper+live."""
-    return get_open_positions_all()
+    return get_open_positions_all(mode=_normalize_mode(mode))
 
 
 @app.get("/api/pnl-curve")
-def get_pnl_curve():
-    """Get cumulative PnL data for chart visualization (paper mode baseline)."""
-    rows = []
-    if table_exists("paper_trades"):
-        rows = query_db(
-            "SELECT exit_time, pnl FROM paper_trades WHERE status LIKE 'closed%' ORDER BY exit_time"
-        )
+def get_pnl_curve(mode: str = "all"):
+    """Get cumulative PnL data for chart visualization."""
+    rows = get_closed_trades(mode=_normalize_mode(mode))
+    rows.sort(key=lambda r: r.get("close_time") or r.get("open_time") or "")
+
     cum_pnl = TOTAL_CAPITAL_USDT
     pnl_curve = []
     for r in rows:
-        cum_pnl += r["pnl"]
+        pnl_value = r.get("pnl") or 0
+        trade_time = r.get("close_time") or r.get("open_time")
+        cum_pnl += pnl_value
         pnl_curve.append({
-            "date": r["exit_time"],
+            "date": trade_time,
             "capital": round(cum_pnl, 2)
         })
     return pnl_curve
 
 
 @app.get("/api/quality")
-def get_quality_metrics():
+def get_quality_metrics(mode: str = "all"):
     """Get quality metrics used for operational bot health scoring."""
     def _to_float(value, default=0.0):
         if value is None:
@@ -216,27 +335,7 @@ def get_quality_metrics():
         except Exception:
             return default
 
-    rows = []
-    if table_exists("paper_trades"):
-        rows.extend(
-            query_db(
-                """
-                SELECT pnl, score, entry_time AS open_time, exit_time AS close_time, status
-                FROM paper_trades
-                WHERE status LIKE 'closed%'
-                """
-            )
-        )
-    if table_exists("live_trades"):
-        rows.extend(
-            query_db(
-                """
-                SELECT COALESCE(pnl, 0) AS pnl, NULL AS score, open_time, close_time, status
-                FROM live_trades
-                WHERE status='closed'
-                """
-            )
-        )
+    rows = get_closed_trades(mode=_normalize_mode(mode))
     rows.sort(key=lambda r: r.get("close_time") or r.get("open_time") or "")
     if not rows:
         return {
@@ -307,8 +406,30 @@ def get_runtime_metrics():
     live_open = sum(1 for row in open_rows if row.get("mode") == "live")
 
     snap = telemetry.snapshot()
+    counters = (snap or {}).get("counters") or {}
+    derived = (snap or {}).get("derived") or {}
+
+    api_error_rate_pct = float(derived.get("api_error_rate_pct") or 0.0)
+    order_reject_rate_pct = float(derived.get("order_reject_rate_pct") or 0.0)
+    desync_events = int(counters.get("live_state_desync_events") or 0)
+    queue_drops = int(counters.get("signals_dropped_queue_full") or 0)
+
+    health_score = 100.0
+    health_score -= min(api_error_rate_pct * 1.5, 35.0)
+    health_score -= min(order_reject_rate_pct * 0.8, 25.0)
+    health_score -= min(desync_events * 4.0, 25.0)
+    health_score -= min(queue_drops * 6.0, 15.0)
+    health_score = round(max(0.0, min(100.0, health_score)), 1)
+
     return {
         "runtime": snap,
+        "health": {
+            "score": health_score,
+            "api_error_rate_pct": round(api_error_rate_pct, 2),
+            "order_reject_rate_pct": round(order_reject_rate_pct, 2),
+            "live_state_desync_events": desync_events,
+            "signals_dropped_queue_full": queue_drops,
+        },
         "db": {
             "open_positions": len(open_rows),
             "open_positions_paper": paper_open,
@@ -316,3 +437,94 @@ def get_runtime_metrics():
             "closed_last_24h": recent_closed,
         },
     }
+
+
+@app.get("/api/per-symbol")
+def get_per_symbol_stats():
+    """Get per-symbol performance breakdown: wins, losses, total PnL per symbol."""
+    rows = []
+    for tbl in ("paper_trades", "live_trades"):
+        if table_exists(tbl):
+            rows += query_db(f"SELECT symbol, pnl FROM {tbl} WHERE status='closed'")
+
+    symbol_stats: dict = {}
+    for r in rows:
+        sym = r.get("symbol") or "UNKNOWN"
+        pnl = float(r.get("pnl") or 0)
+        if sym not in symbol_stats:
+            symbol_stats[sym] = {"symbol": sym, "wins": 0, "losses": 0, "total_pnl": 0.0, "trades": 0}
+        symbol_stats[sym]["trades"] += 1
+        symbol_stats[sym]["total_pnl"] = round(symbol_stats[sym]["total_pnl"] + pnl, 2)
+        if pnl > 0:
+            symbol_stats[sym]["wins"] += 1
+        else:
+            symbol_stats[sym]["losses"] += 1
+
+    for stats in symbol_stats.values():
+        total = stats["trades"]
+        stats["win_rate"] = round(stats["wins"] / total * 100, 1) if total > 0 else 0.0
+
+    return sorted(symbol_stats.values(), key=lambda x: x["total_pnl"], reverse=True)
+
+
+@app.get("/api/signal-quality")
+def get_signal_quality():
+    """Analyse score distribution of winning vs. losing trades."""
+    rows = []
+    for tbl in ("paper_trades", "live_trades"):
+        if table_exists(tbl):
+            rows += query_db(f"SELECT score, pnl FROM {tbl} WHERE status='closed' AND score IS NOT NULL")
+
+    winning_scores = []
+    losing_scores = []
+
+    for r in rows:
+        score = r.get("score")
+        if score is None:
+            continue
+        try:
+            score_val = float(score)
+        except (ValueError, TypeError):
+            continue
+        pnl = float(r.get("pnl") or 0)
+        if pnl > 0:
+            winning_scores.append(score_val)
+        else:
+            losing_scores.append(score_val)
+
+    def _bucket_scores(scores, buckets=None):
+        if buckets is None:
+            buckets = [(0, 60), (60, 70), (70, 80), (80, 90), (90, 101)]
+        result = {}
+        for lo, hi in buckets:
+            label = f"{lo}-{hi-1}"
+            result[label] = sum(1 for s in scores if lo <= s < hi)
+        return result
+
+    return {
+        "total_with_score": len(winning_scores) + len(losing_scores),
+        "avg_winning_score": round(sum(winning_scores) / len(winning_scores), 1) if winning_scores else 0,
+        "avg_losing_score": round(sum(losing_scores) / len(losing_scores), 1) if losing_scores else 0,
+        "winning_distribution": _bucket_scores(winning_scores),
+        "losing_distribution": _bucket_scores(losing_scores),
+    }
+
+
+@app.get("/api/weight-feedback")
+def get_weight_feedback():
+    """Return latest auto-adjusted weight feedback report for dashboard visibility."""
+    try:
+        tracker = PerformanceTracker()
+        report = tracker.get_latest_auto_adjust_report()
+        if not isinstance(report, dict):
+            report = {}
+        report.setdefault("enabled", bool(AUTO_WEIGHT_FEEDBACK_ENABLED))
+        report.setdefault("has_report", False)
+        return report
+    except Exception as err:
+        return {
+            "enabled": bool(AUTO_WEIGHT_FEEDBACK_ENABLED),
+            "has_report": False,
+            "error": str(err),
+        }
+

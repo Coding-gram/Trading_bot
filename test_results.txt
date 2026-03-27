@@ -1,0 +1,121 @@
+============================= test session starts =============================
+collecting ... collected 66 items
+
+tests/test_correlation.py::TestComputeCorrelationMatrix::test_empty_returns_empty PASSED [  1%]
+tests/test_correlation.py::TestComputeCorrelationMatrix::test_single_symbol_returns_empty PASSED [  3%]
+tests/test_correlation.py::TestComputeCorrelationMatrix::test_correlated_assets PASSED [  4%]
+tests/test_correlation.py::TestComputeCorrelationMatrix::test_uncorrelated_assets PASSED [  6%]
+tests/test_correlation.py::TestCheckPortfolioCorrelation::test_empty_matrix_allows PASSED [  7%]
+tests/test_correlation.py::TestCheckPortfolioCorrelation::test_allows_below_threshold PASSED [  9%]
+tests/test_correlation.py::TestCheckPortfolioCorrelation::test_blocks_when_too_correlated PASSED [ 10%]
+tests/test_correlation.py::TestCheckPortfolioCorrelation::test_symbol_not_in_matrix_allows PASSED [ 12%]
+tests/test_risk_manager.py::TestPositionSizing::test_zero_sl_distance PASSED [ 13%]
+tests/test_risk_manager.py::TestPositionSizing::test_normal_sizing PASSED [ 15%]
+tests/test_risk_manager.py::TestPositionSizing::test_consecutive_losses_reduce_risk PASSED [ 16%]
+tests/test_risk_manager.py::TestPositionSizing::test_capital_cap PASSED  [ 18%]
+tests/test_risk_manager.py::TestTrailingStopLoss::test_long_trailing_moves_up PASSED [ 19%]
+tests/test_risk_manager.py::TestTrailingStopLoss::test_long_trailing_never_moves_down PASSED [ 21%]
+tests/test_risk_manager.py::TestTrailingStopLoss::test_short_trailing_moves_down PASSED [ 22%]
+tests/test_risk_manager.py::TestTrailingStopLoss::test_short_trailing_never_moves_up PASSED [ 24%]
+tests/test_risk_manager.py::TestTrailingStopLoss::test_atr_based_offset PASSED [ 25%]
+tests/test_risk_manager.py::TestTrailingStopLoss::test_fallback_when_no_atr PASSED [ 27%]
+tests/test_risk_manager.py::TestTrailingStopLoss::test_trigger_detection PASSED [ 28%]
+tests/test_risk_manager.py::TestDailyLossGuard::test_initial_state_allows_trading PASSED [ 30%]
+tests/test_risk_manager.py::TestDailyLossGuard::test_daily_loss_halts_trading PASSED [ 31%]
+tests/test_risk_manager.py::TestDailyLossGuard::test_drawdown_halts_trading PASSED [ 33%]
+tests/test_risk_manager.py::TestDailyLossGuard::test_daily_reset PASSED  [ 34%]
+tests/test_risk_manager.py::TestDailyLossGuard::test_consecutive_losses_tracked PASSED [ 36%]
+tests/test_risk_manager.py::TestPortfolioHeat::test_empty_positions_allowed PASSED [ 37%]
+tests/test_risk_manager.py::TestPortfolioHeat::test_high_heat_blocked PASSED [ 39%]
+tests/test_risk_manager.py::TestPortfolioHeat::test_low_heat_allowed PASSED [ 40%]
+tests/test_risk_manager.py::TestPortfolioHeat::test_zero_capital PASSED  [ 42%]
+tests/test_risk_manager.py::TestATRStopLoss::test_long_sl_below_entry PASSED [ 43%]
+tests/test_risk_manager.py::TestATRStopLoss::test_short_sl_above_entry PASSED [ 45%]
+tests/test_risk_manager.py::TestTakeProfits::test_long_tps_above_entry PASSED [ 46%]
+tests/test_risk_manager.py::TestTakeProfits::test_short_tps_below_entry PASSED [ 48%]
+tests/test_scorer.py::TestScoreTrend::test_bullish_both_timeframes PASSED [ 50%]
+tests/test_scorer.py::TestScoreTrend::test_bearish_both_timeframes PASSED [ 51%]
+tests/test_scorer.py::TestScoreTrend::test_neutral_no_trend PASSED       [ 53%]
+tests/test_scorer.py::TestScoreTrend::test_nan_trend_returns_neutral PASSED [ 54%]
+tests/test_scorer.py::TestDynamicThreshold::test_low_adx_high_threshold PASSED [ 56%]
+tests/test_scorer.py::TestDynamicThreshold::test_moderate_adx PASSED     [ 57%]
+tests/test_scorer.py::TestDynamicThreshold::test_strong_adx_standard PASSED [ 59%]
+tests/test_scorer.py::TestPenalties::test_htf_disagreement_long_vs_4h_bearish PASSED [ 60%]
+tests/test_scorer.py::TestPenalties::test_htf_agreement_no_penalty PASSED [ 62%]
+tests/test_scorer.py::TestPenalties::test_declining_volume_penalises FAILED [ 63%]
+tests/test_scorer.py::TestPenalties::test_declining_volume_no_penalty_when_stable PASSED [ 65%]
+tests/test_scorer.py::TestPenalties::test_contra_sr_penalises_long_near_resistance FAILED [ 66%]
+tests/test_scorer.py::TestPenalties::test_contra_sr_no_penalty_far_from_resistance PASSED [ 68%]
+tests/test_scorer.py::TestConfluence4H::test_bullish_confluence_bonus PASSED [ 69%]
+tests/test_scorer.py::TestConfluence4H::test_bearish_confluence_bonus PASSED [ 71%]
+tests/test_scorer.py::TestConfluence4H::test_no_bonus_when_conflicting PASSED [ 72%]
+tests/test_scorer.py::TestScoreSignalIntegration::test_score_capped_at_100 FAILED [ 74%]
+tests/test_scorer.py::TestScoreSignalIntegration::test_score_not_negative FAILED [ 75%]
+tests/test_scorer.py::TestScoreSignalIntegration::test_empty_df_returns_zero PASSED [ 77%]
+tests/test_scorer.py::TestScoreSignalIntegration::test_short_df_returns_zero PASSED [ 78%]
+tests/test_signal_dedup.py::TestShouldEmitSignal::test_first_signal_always_emitted PASSED [ 80%]
+tests/test_signal_dedup.py::TestShouldEmitSignal::test_duplicate_within_cooldown_suppressed PASSED [ 81%]
+tests/test_signal_dedup.py::TestShouldEmitSignal::test_different_symbol_not_suppressed PASSED [ 83%]
+tests/test_signal_dedup.py::TestShouldEmitSignal::test_different_direction_emitted PASSED [ 84%]
+tests/test_signal_dedup.py::TestShouldEmitSignal::test_large_score_change_emitted PASSED [ 86%]
+tests/test_signal_dedup.py::TestShouldEmitSignal::test_large_price_move_emitted PASSED [ 87%]
+tests/test_signal_dedup.py::TestShouldEmitSignal::test_neutral_direction_always_passes PASSED [ 89%]
+tests/test_signal_pipeline.py::TestSignalToPaperExecution::test_score_generates_signal_and_paper_engine_opens_position FAILED [ 90%]
+tests/test_signal_pipeline.py::TestSignalToPaperExecution::test_daily_loss_guard_blocks_after_loss_limit PASSED [ 92%]
+tests/test_signal_pipeline.py::TestSignalToPaperExecution::test_paper_engine_stats_include_enhanced_fields PASSED [ 93%]
+tests/test_signal_trade_cooldown.py::test_execute_signal_blocks_when_symbol_cooldown_active PASSED [ 95%]
+tests/test_trade_cooldown.py::test_get_trade_cooldown_seconds_uses_explicit_minutes PASSED [ 96%]
+tests/test_trade_cooldown.py::test_get_trade_cooldown_seconds_uses_primary_timeframe_candles PASSED [ 98%]
+tests/test_trade_cooldown.py::test_cooldown_remaining_seconds_from_recent_close PASSED [100%]
+
+================================== FAILURES ===================================
+________________ TestPenalties.test_declining_volume_penalises ________________
+tests\test_scorer.py:116: in test_declining_volume_penalises
+    assert penalty < 0
+E   assert 5 < 0
+_________ TestPenalties.test_contra_sr_penalises_long_near_resistance _________
+tests\test_scorer.py:132: in test_contra_sr_penalises_long_near_resistance
+    assert penalty < 0
+E   assert 8 < 0
+_____________ TestScoreSignalIntegration.test_score_capped_at_100 _____________
+tests\test_scorer.py:167: in test_score_capped_at_100
+    signal = score_signal(df_1h, df_4h, "TEST/USDT")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+bot\strategy\scorer.py:182: in score_signal
+    score += _score_adx(adx_val, details)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+bot\strategy\scorer.py:338: in _score_adx
+    adx_weight = _scale_weight_by_adx(WEIGHTS["adx_strength"], adx_val, strong_mult=1.20, weak_mult=0.8)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'adx_strength'
+_____________ TestScoreSignalIntegration.test_score_not_negative ______________
+tests\test_scorer.py:173: in test_score_not_negative
+    signal = score_signal(df_1h, df_4h, "TEST/USDT")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+bot\strategy\scorer.py:173: in score_signal
+    score += _score_rsi(c, direction, details)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+bot\strategy\scorer.py:275: in _score_rsi
+    details["rsi"] = f"+{WEIGHTS['rsi_zone']} (RSI in buy zone: {rsi:.1f})"
+                         ^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'rsi_zone'
+_ TestSignalToPaperExecution.test_score_generates_signal_and_paper_engine_opens_position _
+tests\test_signal_pipeline.py:62: in test_score_generates_signal_and_paper_engine_opens_position
+    signal = score_signal(df_1h, df_4h, "TEST/USDT")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+bot\strategy\scorer.py:182: in score_signal
+    score += _score_adx(adx_val, details)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+bot\strategy\scorer.py:338: in _score_adx
+    adx_weight = _scale_weight_by_adx(WEIGHTS["adx_strength"], adx_val, strong_mult=1.20, weak_mult=0.8)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'adx_strength'
+=========================== short test summary info ===========================
+FAILED tests/test_scorer.py::TestPenalties::test_declining_volume_penalises
+FAILED tests/test_scorer.py::TestPenalties::test_contra_sr_penalises_long_near_resistance
+FAILED tests/test_scorer.py::TestScoreSignalIntegration::test_score_capped_at_100
+FAILED tests/test_scorer.py::TestScoreSignalIntegration::test_score_not_negative
+FAILED tests/test_signal_pipeline.py::TestSignalToPaperExecution::test_score_generates_signal_and_paper_engine_opens_position
+======================== 5 failed, 61 passed in 10.33s ========================
+
+EXIT: 1

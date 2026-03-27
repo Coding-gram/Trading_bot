@@ -1,0 +1,1436 @@
+{
+  "created_at_utc": "2026-03-27T13:37:24.233028+00:00",
+  "config": {
+    "symbols": [
+      "BTC/USDT",
+      "ETH/USDT",
+      "BNB/USDT",
+      "SOL/USDT",
+      "ADA/USDT",
+      "XRP/USDT",
+      "DOGE/USDT",
+      "AVAX/USDT",
+      "LINK/USDT",
+      "DOT/USDT",
+      "LTC/USDT",
+      "ATOM/USDT"
+    ],
+    "n_candles": 1800,
+    "folds": 4,
+    "mc_paths": 1000,
+    "seed": 42,
+    "score_grid": [
+      44,
+      48,
+      52,
+      56,
+      60
+    ],
+    "trend_mults": [
+      1.0
+    ],
+    "macd_mults": [
+      1.0
+    ],
+    "penalty_mults": [
+      0.8,
+      0.9,
+      1.0,
+      1.1
+    ],
+    "total_candidates": 20,
+    "evaluated_candidates": 20
+  },
+  "best": {
+    "candidate": {
+      "min_signal_score": 56,
+      "trend_mult": 1.0,
+      "macd_mult": 1.0,
+      "penalty_mult": 1.1
+    },
+    "objective": 70.2894,
+    "portfolio": {
+      "validation_trades_total": 57,
+      "avg_profit_factor": 387.4877,
+      "avg_sharpe": 1.3639,
+      "avg_max_drawdown": 0.0003,
+      "monte_carlo": {
+        "paths": 1000,
+        "trades_per_path": 57,
+        "p_loss": 0.0,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 1094.84,
+        "p05_final_capital": 1065.64
+      }
+    },
+    "symbols": {
+      "BTC/USDT": {
+        "aggregate": {
+          "avg_sharpe": 1.2308,
+          "avg_profit_factor": 148.2766,
+          "avg_max_drawdown": 0.0,
+          "validation_trades": 8
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 8,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1021.8,
+          "p05_final_capital": 1012.76
+        }
+      },
+      "ETH/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.1418,
+          "avg_profit_factor": 250.6553,
+          "avg_max_drawdown": 0.0004,
+          "validation_trades": 3
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 3,
+          "p_loss": 0.259,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1004.75,
+          "p05_final_capital": 997.56
+        }
+      },
+      "BNB/USDT": {
+        "aggregate": {
+          "avg_sharpe": 13.2228,
+          "avg_profit_factor": 749.25,
+          "avg_max_drawdown": 0.0,
+          "validation_trades": 5
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 5,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1019.15,
+          "p05_final_capital": 1018.59
+        }
+      },
+      "SOL/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.0,
+          "avg_profit_factor": 0.0,
+          "avg_max_drawdown": 0.0002,
+          "validation_trades": 3
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 3,
+          "p_loss": 1.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 999.35,
+          "p05_final_capital": 999.35
+        }
+      },
+      "ADA/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.0,
+          "avg_profit_factor": 749.25,
+          "avg_max_drawdown": 0.0,
+          "validation_trades": 3
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 3,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1000.24,
+          "p05_final_capital": 1000.24
+        }
+      },
+      "XRP/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.0,
+          "avg_profit_factor": 749.25,
+          "avg_max_drawdown": 0.0,
+          "validation_trades": 3
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 3,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1002.97,
+          "p05_final_capital": 1002.97
+        }
+      },
+      "DOGE/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.0,
+          "avg_profit_factor": 499.5,
+          "avg_max_drawdown": 0.0,
+          "validation_trades": 2
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 2,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1005.61,
+          "p05_final_capital": 1005.61
+        }
+      },
+      "AVAX/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.3843,
+          "avg_profit_factor": 3.8207,
+          "avg_max_drawdown": 0.0005,
+          "validation_trades": 5
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 5,
+          "p_loss": 0.078,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1008.5,
+          "p05_final_capital": 996.55
+        }
+      },
+      "LINK/USDT": {
+        "aggregate": {
+          "avg_sharpe": 1.4552,
+          "avg_profit_factor": 749.25,
+          "avg_max_drawdown": 0.0,
+          "validation_trades": 7
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 7,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1022.81,
+          "p05_final_capital": 1014.25
+        }
+      },
+      "DOT/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.25,
+          "avg_profit_factor": 499.5,
+          "avg_max_drawdown": 0.0,
+          "validation_trades": 4
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 4,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1011.32,
+          "p05_final_capital": 1000.0
+        }
+      },
+      "LTC/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.2469,
+          "avg_profit_factor": 1.2549,
+          "avg_max_drawdown": 0.0008,
+          "validation_trades": 7
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 7,
+          "p_loss": 0.241,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1005.01,
+          "p05_final_capital": 994.35
+        }
+      },
+      "ATOM/USDT": {
+        "aggregate": {
+          "avg_sharpe": -0.5646,
+          "avg_profit_factor": 249.8452,
+          "avg_max_drawdown": 0.0022,
+          "validation_trades": 7
+        },
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 7,
+          "p_loss": 0.961,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 993.76,
+          "p05_final_capital": 986.75
+        }
+      }
+    }
+  },
+  "top5": [
+    {
+      "candidate": {
+        "min_signal_score": 56,
+        "trend_mult": 1.0,
+        "macd_mult": 1.0,
+        "penalty_mult": 1.1
+      },
+      "objective": 70.2894,
+      "portfolio": {
+        "validation_trades_total": 57,
+        "avg_profit_factor": 387.4877,
+        "avg_sharpe": 1.3639,
+        "avg_max_drawdown": 0.0003,
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 57,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1094.84,
+          "p05_final_capital": 1065.64
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 1.2308,
+            "avg_profit_factor": 148.2766,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 8
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 8,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1021.8,
+            "p05_final_capital": 1012.76
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1418,
+            "avg_profit_factor": 250.6553,
+            "avg_max_drawdown": 0.0004,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.259,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1004.75,
+            "p05_final_capital": 997.56
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": 13.2228,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1019.15,
+            "p05_final_capital": 1018.59
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0002,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 999.35,
+            "p05_final_capital": 999.35
+          }
+        },
+        "ADA/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1000.24,
+            "p05_final_capital": 1000.24
+          }
+        },
+        "XRP/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1002.97,
+            "p05_final_capital": 1002.97
+          }
+        },
+        "DOGE/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 499.5,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 2,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.61,
+            "p05_final_capital": 1005.61
+          }
+        },
+        "AVAX/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.3843,
+            "avg_profit_factor": 3.8207,
+            "avg_max_drawdown": 0.0005,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.078,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1008.5,
+            "p05_final_capital": 996.55
+          }
+        },
+        "LINK/USDT": {
+          "aggregate": {
+            "avg_sharpe": 1.4552,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1022.81,
+            "p05_final_capital": 1014.25
+          }
+        },
+        "DOT/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.25,
+            "avg_profit_factor": 499.5,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 4
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 4,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1011.32,
+            "p05_final_capital": 1000.0
+          }
+        },
+        "LTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.2469,
+            "avg_profit_factor": 1.2549,
+            "avg_max_drawdown": 0.0008,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.241,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.01,
+            "p05_final_capital": 994.35
+          }
+        },
+        "ATOM/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.5646,
+            "avg_profit_factor": 249.8452,
+            "avg_max_drawdown": 0.0022,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.961,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 993.76,
+            "p05_final_capital": 986.75
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "min_signal_score": 56,
+        "trend_mult": 1.0,
+        "macd_mult": 1.0,
+        "penalty_mult": 1.0
+      },
+      "objective": 70.2367,
+      "portfolio": {
+        "validation_trades_total": 57,
+        "avg_profit_factor": 387.4625,
+        "avg_sharpe": 1.3587,
+        "avg_max_drawdown": 0.0003,
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 57,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1092.39,
+          "p05_final_capital": 1064.17
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 1.2308,
+            "avg_profit_factor": 148.2766,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 8
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 8,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1021.8,
+            "p05_final_capital": 1012.76
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1418,
+            "avg_profit_factor": 250.6553,
+            "avg_max_drawdown": 0.0004,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.259,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1004.75,
+            "p05_final_capital": 997.56
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": 13.2228,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1019.15,
+            "p05_final_capital": 1018.59
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0002,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 999.35,
+            "p05_final_capital": 999.35
+          }
+        },
+        "ADA/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1000.24,
+            "p05_final_capital": 1000.24
+          }
+        },
+        "XRP/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1002.97,
+            "p05_final_capital": 1002.97
+          }
+        },
+        "DOGE/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 499.5,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 2,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.61,
+            "p05_final_capital": 1005.61
+          }
+        },
+        "AVAX/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.3843,
+            "avg_profit_factor": 3.8207,
+            "avg_max_drawdown": 0.0005,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.078,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1008.5,
+            "p05_final_capital": 996.55
+          }
+        },
+        "LINK/USDT": {
+          "aggregate": {
+            "avg_sharpe": 1.4552,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1022.81,
+            "p05_final_capital": 1014.25
+          }
+        },
+        "DOT/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.25,
+            "avg_profit_factor": 499.5,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 4
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 4,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1011.32,
+            "p05_final_capital": 1000.0
+          }
+        },
+        "LTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1837,
+            "avg_profit_factor": 0.9527,
+            "avg_max_drawdown": 0.0008,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.32,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1002.87,
+            "p05_final_capital": 994.35
+          }
+        },
+        "ATOM/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.5646,
+            "avg_profit_factor": 249.8452,
+            "avg_max_drawdown": 0.0022,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.961,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 993.76,
+            "p05_final_capital": 986.75
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "min_signal_score": 60,
+        "trend_mult": 1.0,
+        "macd_mult": 1.0,
+        "penalty_mult": 1.0
+      },
+      "objective": 69.7833,
+      "portfolio": {
+        "validation_trades_total": 41,
+        "avg_profit_factor": 395.8174,
+        "avg_sharpe": 8.3103,
+        "avg_max_drawdown": 0.0002,
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 41,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1081.44,
+          "p05_final_capital": 1056.02
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 85.1613,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1021.88,
+            "p05_final_capital": 1020.9
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1264,
+            "avg_profit_factor": 250.5114,
+            "avg_max_drawdown": 0.0004,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.259,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1003.85,
+            "p05_final_capital": 997.56
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": 13.2228,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1019.15,
+            "p05_final_capital": 1018.59
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0002,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 999.35,
+            "p05_final_capital": 999.35
+          }
+        },
+        "ADA/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1000.24,
+            "p05_final_capital": 1000.24
+          }
+        },
+        "XRP/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1002.97,
+            "p05_final_capital": 1002.97
+          }
+        },
+        "DOGE/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 499.5,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 2,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.61,
+            "p05_final_capital": 1005.61
+          }
+        },
+        "AVAX/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.2052,
+            "avg_profit_factor": 252.2928,
+            "avg_max_drawdown": 0.0002,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.036,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1012.12,
+            "p05_final_capital": 1004.38
+          }
+        },
+        "LINK/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.7606,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1015.03,
+            "p05_final_capital": 1005.84
+          }
+        },
+        "DOT/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 0
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 0,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1000.0,
+            "p05_final_capital": 1000.0
+          }
+        },
+        "LTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.2469,
+            "avg_profit_factor": 1.2549,
+            "avg_max_drawdown": 0.0008,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.241,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.01,
+            "p05_final_capital": 994.35
+          }
+        },
+        "ATOM/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0008,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 2,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 996.59,
+            "p05_final_capital": 996.59
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "min_signal_score": 60,
+        "trend_mult": 1.0,
+        "macd_mult": 1.0,
+        "penalty_mult": 1.1
+      },
+      "objective": 69.4333,
+      "portfolio": {
+        "validation_trades_total": 38,
+        "avg_profit_factor": 333.3799,
+        "avg_sharpe": 8.3103,
+        "avg_max_drawdown": 0.0002,
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 38,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1081.59,
+          "p05_final_capital": 1057.29
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 85.1613,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1021.88,
+            "p05_final_capital": 1020.9
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1264,
+            "avg_profit_factor": 250.5114,
+            "avg_max_drawdown": 0.0004,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.259,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1003.85,
+            "p05_final_capital": 997.56
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": 13.2228,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1019.15,
+            "p05_final_capital": 1018.59
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0002,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 999.35,
+            "p05_final_capital": 999.35
+          }
+        },
+        "ADA/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 0
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 0,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1000.0,
+            "p05_final_capital": 1000.0
+          }
+        },
+        "XRP/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1002.97,
+            "p05_final_capital": 1002.97
+          }
+        },
+        "DOGE/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 499.5,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 2,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.61,
+            "p05_final_capital": 1005.61
+          }
+        },
+        "AVAX/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.2052,
+            "avg_profit_factor": 252.2928,
+            "avg_max_drawdown": 0.0002,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.036,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1012.12,
+            "p05_final_capital": 1004.38
+          }
+        },
+        "LINK/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.7606,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1015.03,
+            "p05_final_capital": 1005.84
+          }
+        },
+        "DOT/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 0
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 0,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1000.0,
+            "p05_final_capital": 1000.0
+          }
+        },
+        "LTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.2469,
+            "avg_profit_factor": 1.2549,
+            "avg_max_drawdown": 0.0008,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.241,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.01,
+            "p05_final_capital": 994.35
+          }
+        },
+        "ATOM/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0008,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 2,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 996.59,
+            "p05_final_capital": 996.59
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "min_signal_score": 60,
+        "trend_mult": 1.0,
+        "macd_mult": 1.0,
+        "penalty_mult": 0.8
+      },
+      "objective": 69.2825,
+      "portfolio": {
+        "validation_trades_total": 52,
+        "avg_profit_factor": 366.6877,
+        "avg_sharpe": 1.3216,
+        "avg_max_drawdown": 0.0002,
+        "monte_carlo": {
+          "paths": 1000,
+          "trades_per_path": 52,
+          "p_loss": 0.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1088.26,
+          "p05_final_capital": 1061.02
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 1.2308,
+            "avg_profit_factor": 148.2766,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 8
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 8,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1021.8,
+            "p05_final_capital": 1012.76
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1418,
+            "avg_profit_factor": 250.6553,
+            "avg_max_drawdown": 0.0004,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.259,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1004.75,
+            "p05_final_capital": 997.56
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": 13.2228,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1019.15,
+            "p05_final_capital": 1018.59
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0002,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 999.35,
+            "p05_final_capital": 999.35
+          }
+        },
+        "ADA/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1000.24,
+            "p05_final_capital": 1000.24
+          }
+        },
+        "XRP/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1002.97,
+            "p05_final_capital": 1002.97
+          }
+        },
+        "DOGE/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 499.5,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 2,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.61,
+            "p05_final_capital": 1005.61
+          }
+        },
+        "AVAX/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.3843,
+            "avg_profit_factor": 3.8207,
+            "avg_max_drawdown": 0.0005,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.078,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1008.5,
+            "p05_final_capital": 996.55
+          }
+        },
+        "LINK/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.8035,
+            "avg_profit_factor": 749.25,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1014.15,
+            "p05_final_capital": 1005.84
+          }
+        },
+        "DOT/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.0,
+            "avg_profit_factor": 249.75,
+            "avg_max_drawdown": 0.0,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 3,
+            "p_loss": 0.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1008.11,
+            "p05_final_capital": 1000.0
+          }
+        },
+        "LTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.2469,
+            "avg_profit_factor": 1.2549,
+            "avg_max_drawdown": 0.0008,
+            "validation_trades": 7
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 7,
+            "p_loss": 0.241,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1005.01,
+            "p05_final_capital": 994.35
+          }
+        },
+        "ATOM/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.1711,
+            "avg_profit_factor": 249.995,
+            "avg_max_drawdown": 0.0008,
+            "validation_trades": 5
+          },
+          "monte_carlo": {
+            "paths": 1000,
+            "trades_per_path": 5,
+            "p_loss": 0.682,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 999.1,
+            "p05_final_capital": 994.02
+          }
+        }
+      }
+    }
+  ],
+  "baseline": {
+    "report_path": "calibration_report.json",
+    "objective": 18.7982,
+    "min_improvement": 0.0,
+    "improvement": 51.4912,
+    "apply_if_improved": false,
+    "applied": false,
+    "target_env": ".env",
+    "interrupted": false
+  }
+}

@@ -72,11 +72,12 @@ def test_run():
             known_error_count,
             unexpected_error_count,
         )
-        return 1
 
+    assert total_errors == 0, (
+        f"Known errors: {known_error_count}, unexpected errors: {unexpected_error_count}"
+    )
     logger.info("Test run passed: no symbol errors")
-    return 0
 
 
 if __name__ == '__main__':
-    raise SystemExit(test_run())
+    test_run()

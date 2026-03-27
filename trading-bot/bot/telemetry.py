@@ -152,5 +152,24 @@ def snapshot() -> dict:
     }
 
 
+def prune_old_events(retention_days: int = 7) -> dict:
+    """Delete telemetry events older than retention_days to prevent unbounded DB growth."""
+    from datetime import timedelta
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max(retention_days, 1))
+    cutoff_iso = cutoff.isoformat()
+    deleted = 0
+    try:
+        with _db_connect() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "DELETE FROM telemetry_events WHERE created_at < ?",
+                (cutoff_iso,),
+            )
+            deleted = cur.rowcount if cur.rowcount is not None else 0
+    except Exception:
+        pass
+    return {"deleted": max(deleted, 0), "cutoff": cutoff_iso}
+
+
 _init_db()
 _load_from_db()

@@ -174,12 +174,23 @@ def fetch_balance(exchange) -> dict:
     """Get current USDT balance from exchange."""
     try:
         balance = exchange.fetch_balance()
+        usdt = balance.get("USDT") if isinstance(balance, dict) else None
+        if not isinstance(usdt, dict):
+            total = balance.get("total") if isinstance(balance, dict) else None
+            free = balance.get("free") if isinstance(balance, dict) else None
+            usdt = {
+                "free": (free or {}).get("USDT") if isinstance(free, dict) else None,
+                "total": (total or {}).get("USDT") if isinstance(total, dict) else None,
+            }
         return {
-            "USDT_free": balance["USDT"]["free"],
-            "USDT_total": balance["USDT"]["total"],
+            "USDT_free": float((usdt or {}).get("free") or 0.0),
+            "USDT_total": float((usdt or {}).get("total") or 0.0),
         }
     except ccxt.BaseError as e:
         logger.error("Balance fetch error: %s", e)
+        return {}
+    except Exception as e:
+        logger.error("Balance parse/fetch error: %s", e)
         return {}
 
 
@@ -208,4 +219,98 @@ async def async_fetch_multi_timeframe(exchange, symbol: str, timeframes: list) -
     for tf in timeframes:
         result[tf] = await async_fetch_ohlcv(exchange, symbol, timeframe=tf)
         await asyncio.sleep(0.1)
+    return result
+
+
+# ── Batch Ticker Fetch (Suggestion #2) ───────────────────────────────────────
+
+def fetch_tickers_batch(exchange, symbols: list[str]) -> dict[str, dict]:
+    """Fetch tickers for multiple symbols in a single API call.
+
+    Falls back to individual fetch_ticker calls if the exchange
+    doesn't support batch fetching.
+
+    Returns:
+        Dict mapping symbol to ticker dict (same format as fetch_ticker).
+    """
+    result = {}
+
+    # Try batch fetch first (much lower API weight)
+    try:
+        raw = exchange.fetch_tickers(symbols)
+        if isinstance(raw, dict):
+            for sym in symbols:
+                ticker = raw.get(sym)
+                if ticker:
+                    result[sym] = {
+                        "price": ticker.get("last"),
+                        "bid": ticker.get("bid"),
+                        "ask": ticker.get("ask"),
+                        "volume_24h": ticker.get("quoteVolume"),
+                        "change_24h": ticker.get("percentage"),
+                    }
+            return result
+    except Exception as batch_err:
+        logger.warning("Batch ticker fetch failed, falling back to individual: %s", batch_err)
+
+    # Fallback: individual fetches
+    for sym in symbols:
+        ticker = fetch_ticker(exchange, sym)
+        if ticker:
+            result[sym] = ticker
+        time.sleep(0.1)
+    return result
+
+
+# ── Order Book Depth Check (Suggestion #6) ───────────────────────────────────
+
+def fetch_order_book_depth(exchange, symbol: str, limit: int = 10) -> dict:
+    """Fetch order book and compute bid/ask depth metrics.
+
+    Returns:
+        Dict with bid_depth_usdt, ask_depth_usdt, bid_ask_imbalance,
+        or empty dict on failure.
+    """
+    try:
+        book = exchange.fetch_order_book(symbol, limit=limit)
+        bids = book.get("bids") or []
+        asks = book.get("asks") or []
+
+        bid_depth = sum(price * amount for price, amount in bids[:limit])
+        ask_depth = sum(price * amount for price, amount in asks[:limit])
+        total = bid_depth + ask_depth
+
+        return {
+            "bid_depth_usdt": round(bid_depth, 2),
+            "ask_depth_usdt": round(ask_depth, 2),
+            "bid_ask_imbalance": round((bid_depth - ask_depth) / total, 4) if total > 0 else 0.0,
+            "total_depth_usdt": round(total, 2),
+        }
+    except Exception as e:
+        logger.warning("Order book fetch failed for %s: %s", symbol, e)
+        return {}
+
+
+# ── Async REST Fetcher (Suggestion #9) ───────────────────────────────────────
+
+async def async_fetch_ohlcv_rest(exchange, symbol: str, timeframe: str = "1h", limit: int = 300) -> pd.DataFrame:
+    """True async OHLCV fetch using asyncio.to_thread for REST exchanges.
+
+    Preferred over synchronous fetch_ohlcv when running inside an async loop
+    to avoid blocking the event loop.
+    """
+    try:
+        df = await asyncio.to_thread(fetch_ohlcv, exchange, symbol, timeframe, limit)
+        return df
+    except Exception as e:
+        logger.error("[ASYNC-REST] Error fetching OHLCV for %s: %s", symbol, e)
+        return pd.DataFrame()
+
+
+async def async_fetch_multi_timeframe_rest(exchange, symbol: str, timeframes: list) -> dict:
+    """Async fetch OHLCV for multiple timeframes using REST (non-blocking)."""
+    result = {}
+    for tf in timeframes:
+        result[tf] = await async_fetch_ohlcv_rest(exchange, symbol, timeframe=tf)
+        await asyncio.sleep(0.15)
     return result

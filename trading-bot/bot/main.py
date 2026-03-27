@@ -5,11 +5,12 @@ Fully automated in live mode: sends signal alerts and places orders when guards 
 import argparse
 import contextlib
 import logging
+import logging.handlers
 import time
 import asyncio
-import subprocess
 import sys
-from datetime import date
+import threading
+from datetime import date, datetime, timezone
 from pathlib import Path
 import pandas as pd
 
@@ -18,321 +19,81 @@ if not hasattr(pd.DataFrame, 'applymap'):
     pd.DataFrame.applymap = pd.DataFrame.map
 
 from bot.config import (
-    BINANCE_API_KEY, BINANCE_API_SECRET,
-    WATCHLIST, PRIMARY_TIMEFRAME, CONFIRM_TIMEFRAME,
+    WATCHLIST, PRIMARY_TIMEFRAME, CONFIRM_TIMEFRAME, DAILY_TIMEFRAME,
     SCAN_INTERVAL_SECONDS, TOTAL_CAPITAL_USDT,
     MAX_SIMULTANEOUS_TRADES, DAILY_LOSS_LIMIT_PCT, MAX_DRAWDOWN_PCT,
-    MAX_ENTRY_SPREAD_PCT, LIVE_ORDER_TYPE,
-    LIVE_CONFIRMATION_PHRASE, LIVE_CONFIRMATION_REQUIRED_VALUE, WS_MAX_SYMBOLS,
+    LIVE_ORDER_TYPE,
+    WS_MAX_SYMBOLS,
     DB_PATH, DB_RETENTION_DAYS, SIGNAL_QUEUE_MAXSIZE,
 )
 from bot.analysis import indicators
-from bot.data.fetcher import get_exchange, fetch_multi_timeframe, fetch_ticker, fetch_balance
+from bot.data.fetcher import get_exchange, fetch_ticker, fetch_balance
 from bot.data.ws_fetcher import WebSocketFetcher
 from bot.strategy.scorer import score_signal
-from bot.risk.risk_manager import (
-    choose_stop_loss, calculate_take_profits, calculate_position_size, DailyLossGuard
-)
+from bot.risk.risk_manager import DailyLossGuard
+from bot.risk.correlation import compute_correlation_matrix, check_portfolio_correlation
 from bot.execution.paper_trade import PaperTradeEngine
 from bot.execution.live_trade import LiveTradeEngine
 from bot.execution.db_maintenance import prune_old_trades
-from bot.notifications.telegram import (
-    send_signal_alert, send_trade_closed, send_daily_summary, send_risk_alert, send_panic_alert
+from bot.signal_worker import should_emit_signal, signal_worker_loop
+from bot.signal_worker import (
+    _telemetry_increment, _telemetry_record_event,
+    _safe_send_panic_alert, _safe_send_trade_closed,
+    _safe_send_daily_summary, _safe_send_risk_alert,
 )
+from bot.orchestrator import (
+    handle_daily_reset as orchestrator_handle_daily_reset,
+    process_open_positions as orchestrator_process_open_positions,
+    scan_for_signals as orchestrator_scan_for_signals,
+    is_spread_ok, is_volatility_normal,
+)
+from bot.startup import (
+    run_startup_health_gate,
+    run_live_arming_check,
+    run_live_exchange_readiness_check,
+)
+from bot.telemetry import prune_old_events
 from bot import telemetry
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s - %(message)s",
-    handlers=[
-        logging.FileHandler("bot.log", encoding="utf-8"),
-        logging.StreamHandler(),
-    ]
-)
+
+def _setup_logging():
+    """Configure logging with rotation (5MB max, 5 backups)."""
+    log_formatter = logging.Formatter(
+        "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
+    )
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+
+    # Rotating file handler (5MB, 5 backups)
+    file_handler = logging.handlers.RotatingFileHandler(
+        "bot.log",
+        maxBytes=5_000_000,
+        backupCount=5,
+        encoding="utf-8",
+    )
+    file_handler.setFormatter(log_formatter)
+    root_logger.addHandler(file_handler)
+
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(log_formatter)
+    root_logger.addHandler(console_handler)
+
+
+_setup_logging()
 logger = logging.getLogger("main")
 
-
-MAX_SPREAD_PCT = MAX_ENTRY_SPREAD_PCT   # skip if bid-ask spread > threshold
-ATR_SPIKE_MULT = 3.0     # skip if ATR is 3x the rolling average (news proxy)
+ATR_SPIKE_MULT = 3.0
 REST_SYMBOL_DELAY_SECONDS = 0.5
 MAX_CANDLE_CACHE_ROWS = 1200
 
+# Graceful shutdown event (cross-platform)
+_shutdown_event = asyncio.Event()
 
-def _telemetry_increment(metric: str, amount: int = 1) -> None:
-    try:
-        telemetry.increment(metric, amount)
-    except Exception as telemetry_err:
-        logger.warning("Telemetry increment failed for %s: %s", metric, telemetry_err)
-
-
-def _telemetry_record_event(metric: str, value) -> None:
-    try:
-        telemetry.record_event(metric, value)
-    except Exception as telemetry_err:
-        logger.warning("Telemetry event failed for %s: %s", metric, telemetry_err)
-
-
-def _safe_send_signal_alert(signal: dict, risk_params: dict) -> None:
-    try:
-        send_signal_alert(signal, risk_params)
-    except Exception as alert_err:
-        logger.error("Signal alert failed for %s: %s", signal.get("symbol"), alert_err)
-        _telemetry_increment("api_errors")
-
-
-def _safe_send_panic_alert(message: str) -> None:
-    try:
-        send_panic_alert(message)
-    except Exception as alert_err:
-        logger.error("Panic alert failed: %s", alert_err)
-        _telemetry_increment("api_errors")
-
-
-def _safe_send_trade_closed(symbol, status, entry, exit_price, pnl, reason) -> None:
-    try:
-        send_trade_closed(symbol, status, entry, exit_price, pnl, reason)
-    except Exception as alert_err:
-        logger.error("Trade-closed alert failed for %s: %s", symbol, alert_err)
-        _telemetry_increment("api_errors")
-
-
-def _safe_send_daily_summary(stats: dict) -> None:
-    try:
-        send_daily_summary(stats)
-    except Exception as alert_err:
-        logger.error("Daily summary alert failed: %s", alert_err)
-        _telemetry_increment("api_errors")
-
-
-def _safe_send_risk_alert(message: str) -> None:
-    try:
-        send_risk_alert(message)
-    except Exception as alert_err:
-        logger.error("Risk alert failed: %s", alert_err)
-        _telemetry_increment("api_errors")
-
-
-def is_spread_ok(ticker: dict, symbol: str) -> bool:
-    """Return False if bid-ask spread is too wide (illiquid / manipulated)."""
-    bid = ticker.get("bid") or 0
-    ask = ticker.get("ask") or 0
-    if bid <= 0 or ask <= 0:
-        return True  # can't check, allow through
-    spread_pct = (ask - bid) / bid
-    if spread_pct > MAX_SPREAD_PCT:
-        logger.warning(
-            "[%s] Spread too wide: %.3f%% > %.1f%% - skipping",
-            symbol, spread_pct * 100, MAX_SPREAD_PCT * 100
-        )
-        return False
-    return True
-
-
-def is_volatility_normal(df: pd.DataFrame, symbol: str) -> bool:
-    """Return False if ATR has spiked (likely a news event) - protects from violent moves."""
-    if df is None or df.empty or "atr" not in df.columns:
-        return True
-    atr_col = df["atr"].dropna()
-    if len(atr_col) < 20:
-        return True
-    avg_atr = atr_col.iloc[-20:-1].mean()
-    current_atr = atr_col.iloc[-1]
-    if avg_atr > 0 and current_atr > avg_atr * ATR_SPIKE_MULT:
-        logger.warning(
-            "[%s] Volatility spike detected: ATR %.4f > %.1fx avg %.4f - possible news event, skipping",
-            symbol, current_atr, ATR_SPIKE_MULT, avg_atr
-        )
-        return False
-    return True
-
-
-def handle_daily_reset(engine: PaperTradeEngine, loss_guard: DailyLossGuard, today: date) -> date:
-    """Check if a new day has started and reset daily stats."""
-    current_date = date.today()
-    if current_date != today:
-        stats = engine.get_stats()
-        _safe_send_daily_summary(stats)
-        loss_guard.reset_daily(engine.capital)
-        logger.info("📅 Daily reset done for %s.", current_date)
-        return current_date
-    return today
-
-
-def process_open_positions(exchange, engine: PaperTradeEngine, loss_guard: DailyLossGuard, mode: str = "paper", live_engine: LiveTradeEngine | None = None):
-    """Update stop-loss/take-profit for all currently open trades."""
-    if mode == "live" and live_engine is not None:
-        live_engine.reconcile_orders()
-        live_engine.monitor_positions()
-        return
-
-    if not engine.positions:
-        return
-
-    live_prices = {}
-    for sym in list(engine.positions.keys()):
-        ticker = fetch_ticker(exchange, sym)
-        if ticker:
-            live_prices[sym] = ticker["price"]
-
-    closed = engine.update_positions(live_prices)
-    _telemetry_record_event("last_closed_count", len(closed))
-    for c in closed:
-        _safe_send_trade_closed(
-            c["symbol"], c["status"], c["entry"],
-            c["exit_price"], c["pnl"], c["status"]
-        )
-        loss_guard.record_trade(c["pnl"])
-
-
-def scan_for_signals(
-    exchange,
-    engine: PaperTradeEngine,
-    loss_guard: DailyLossGuard,
-    mode: str,
-    live_engine: LiveTradeEngine | None = None,
-    symbols_to_scan: list[str] | None = None,
-    signal_queue: asyncio.Queue | None = None,
-    per_symbol_delay_seconds: float = 0.0,
-):
-    """Scan the watchlist for new entries if slots are available."""
-    _telemetry_increment("scans_total")
-    active_positions = live_engine.positions if (mode == "live" and live_engine is not None) else engine.positions
-    open_slots = MAX_SIMULTANEOUS_TRADES - len(active_positions)
-    if open_slots == 0:
-        logger.info("Max positions open. Monitoring only.")
-        _telemetry_increment("scan_skipped_max_positions")
-        return
-
-    symbols = symbols_to_scan if symbols_to_scan is not None else WATCHLIST
-    for symbol in symbols:
-        _telemetry_increment("symbols_scanned")
-        if symbol in active_positions:
-            _telemetry_increment("symbols_skipped_already_open")
-            continue
-
-        dfs = fetch_multi_timeframe(exchange, symbol, [PRIMARY_TIMEFRAME, CONFIRM_TIMEFRAME])
-        df_1h = dfs.get(PRIMARY_TIMEFRAME)
-        df_4h = dfs.get(CONFIRM_TIMEFRAME)
-
-        if df_1h is None or df_4h is None or df_1h.empty:
-            _telemetry_increment("symbols_skipped_missing_data")
-            continue
-
-        ticker = fetch_ticker(exchange, symbol)
-        if ticker and not is_spread_ok(ticker, symbol):
-            _telemetry_increment("symbols_skipped_spread")
-            continue
-
-        # Compute ATR before volatility filter (ATR-based spike detection).
-        df_1h_with_indicators = indicators.compute_all(df_1h)
-        if not is_volatility_normal(df_1h_with_indicators, symbol):
-            _telemetry_increment("symbols_skipped_volatility")
-            continue
-
-        signal = score_signal(df_1h, df_4h, symbol)
-        if signal["send_alert"]:
-            _telemetry_increment("alerts_sent")
-            if signal_queue is not None:
-                try:
-                    signal_queue.put_nowait(signal)
-                    _telemetry_record_event("signal_queue_depth", signal_queue.qsize())
-                except asyncio.QueueFull:
-                    logger.warning("Signal queue full; dropping signal for %s", symbol)
-                    _telemetry_increment("signals_dropped_queue_full")
-            else:
-                _execute_signal(engine, loss_guard, signal, mode, live_engine=live_engine)
-
-        if per_symbol_delay_seconds > 0:
-            time.sleep(per_symbol_delay_seconds)
-
-
-def _execute_signal(
-    engine: PaperTradeEngine,
-    loss_guard: DailyLossGuard,
-    signal: dict,
-    mode: str,
-    live_engine: LiveTradeEngine | None = None,
-):
-    """Calculate risk parameters and execute the trade/alert."""
-    entry = signal["price"]
-    atr = signal["atr"]
-    sr = signal.get("sr_levels", {})
-    fib = signal.get("fib_levels", {})
-
-    sl = choose_stop_loss(entry, atr, signal["direction"], sr)
-    tps = calculate_take_profits(entry, sl, signal["direction"], fib)
-
-    capital_for_sizing = engine.capital
-    if mode == "live" and live_engine is not None:
-        try:
-            bal = fetch_balance(live_engine.exchange)
-            live_free_usdt = float((bal or {}).get("USDT_free") or 0.0)
-            if live_free_usdt > 0:
-                capital_for_sizing = live_free_usdt
-            else:
-                logger.warning("[LIVE] Could not read positive free USDT from exchange; using fallback capital %.2f", capital_for_sizing)
-        except Exception as balance_err:
-            logger.warning("[LIVE] Balance fetch failed; using fallback capital %.2f (%s)", capital_for_sizing, balance_err)
-
-    pos = calculate_position_size(capital_for_sizing, entry, sl, consecutive_losses=loss_guard.consecutive_losses)
-
-    if mode == "live" and live_engine is not None:
-        max_affordable_qty = capital_for_sizing / entry if entry > 0 else 0.0
-        if max_affordable_qty > 0:
-            pos["qty"] = round(min(float(pos.get("qty") or 0.0), max_affordable_qty), 8)
-            pos["usdt_value"] = round(pos["qty"] * entry, 2)
-            pos["usdt_risk"] = round(pos["qty"] * abs(entry - sl), 2)
-            pos["risk_pct"] = round((pos["usdt_risk"] / capital_for_sizing) * 100, 2) if capital_for_sizing > 0 else 0.0
-
-    risk_params = {
-        "sl": sl,
-        "tp1": tps["tp1"],
-        "tp2": tps["tp2"],
-        "qty": pos["qty"],
-        "usdt_value": pos["usdt_value"],
-        "risk_pct": pos["risk_pct"],
-    }
-
-    _safe_send_signal_alert(signal, risk_params)
-    _telemetry_record_event("last_signal", {
-        "symbol": signal.get("symbol"),
-        "score": signal.get("score"),
-        "direction": signal.get("direction"),
-    })
-    logger.info("📲 Alert sent for %s | Score: %s", signal['symbol'], signal['score'])
-
-    if mode == "paper":
-        engine.open_position(signal, risk_params)
-        return
-
-    if mode == "live" and live_engine is not None:
-        side = "buy" if signal["direction"] == "long" else "sell"
-        order_type = LIVE_ORDER_TYPE if LIVE_ORDER_TYPE in {"market", "limit"} else "market"
-        order_price = entry if order_type == "limit" else None
-        order = live_engine.create_order(
-            symbol=signal["symbol"],
-            side=side,
-            qty=risk_params["qty"],
-            price=order_price,
-            type=order_type,
-            risk_params=risk_params,
-        )
-        if order is None:
-            _telemetry_increment("live_orders_failed")
-            _safe_send_panic_alert(f"Live order rejected/failed for {signal['symbol']} ({side})")
-            return
-
-        _telemetry_increment("live_orders_created")
-        _telemetry_record_event("last_live_order", {
-            "symbol": signal["symbol"],
-            "side": side,
-            "qty": risk_params["qty"],
-            "type": order_type,
-        })
-        logger.info("[LIVE] Order created for %s (%s)", signal["symbol"], side)
 
 async def run_bot_async(mode: str = "paper"):
     logger.info("🚀 Trading Bot Starting | Mode: %s (WebSocket)", mode.upper())
+    telemetry.record_event("bot_session_started_at", datetime.now(timezone.utc).isoformat())
     engine = PaperTradeEngine(starting_capital=TOTAL_CAPITAL_USDT)
     loss_guard = DailyLossGuard(TOTAL_CAPITAL_USDT)
     today = date.today()
@@ -352,18 +113,35 @@ async def run_bot_async(mode: str = "paper"):
         logger.info("WS symbols: %s", ", ".join(ws_symbols))
         logger.info("REST supplement symbols: %s", ", ".join(rest_symbols))
 
-    timeframes = [PRIMARY_TIMEFRAME, CONFIRM_TIMEFRAME]
+    timeframes = list(dict.fromkeys([PRIMARY_TIMEFRAME, CONFIRM_TIMEFRAME, DAILY_TIMEFRAME]))
     ws_fetcher = WebSocketFetcher(ws_symbols, timeframes, use_private_auth=(mode == "live"))
     error_count = 0
     CIRCUIT_BREAKER_THRESHOLD = 3
     exchange = get_exchange(paper_mode=(mode == "paper"))
     live_engine = LiveTradeEngine(exchange) if mode == "live" else None
+    if mode == "paper":
+        try:
+            reconcile_report = await asyncio.to_thread(engine.reconcile_open_positions_with_market, exchange)
+            logger.info(
+                "[PAPER] Startup reconcile: checked=%d tp1_marked=%d closed_tp2=%d closed_sl=%d errors=%d",
+                reconcile_report.get("checked", 0),
+                reconcile_report.get("tp1_marked", 0),
+                reconcile_report.get("closed_tp2", 0),
+                reconcile_report.get("closed_sl", 0),
+                reconcile_report.get("errors", 0),
+            )
+            _telemetry_record_event("paper_startup_reconcile", reconcile_report)
+        except Exception as startup_reconcile_err:
+            logger.error("[PAPER] Startup reconcile error: %s", startup_reconcile_err)
+            _telemetry_increment("api_errors")
     candle_cache = {sym: {} for sym in ws_symbols}
     last_processed_primary_ts = {}
     rest_task = None
     signal_worker_task = None
     signal_queue: asyncio.Queue = asyncio.Queue(maxsize=SIGNAL_QUEUE_MAXSIZE)
     last_db_maintenance_day: date | None = None
+    queue_overflow_alert_cooldown_seconds = 300
+    last_queue_overflow_alert_at = 0.0
 
     async def _maybe_run_db_maintenance() -> None:
         nonlocal last_db_maintenance_day
@@ -384,19 +162,27 @@ async def run_bot_async(mode: str = "paper"):
         except Exception as maintenance_err:
             logger.error("DB maintenance failed: %s", maintenance_err)
             _telemetry_increment("api_errors")
+        # Prune old telemetry events (keep 7 days)
+        try:
+            telem_result = await asyncio.to_thread(prune_old_events, 7)
+            if telem_result.get("deleted", 0) > 0:
+                logger.info(
+                    "Telemetry pruned: deleted=%d events older than %s",
+                    telem_result["deleted"],
+                    telem_result.get("cutoff", "n/a"),
+                )
+        except Exception as telem_err:
+            logger.warning("Telemetry prune failed: %s", telem_err)
 
-    async def _signal_worker() -> None:
-        while True:
-            signal = await signal_queue.get()
-            try:
-                await asyncio.to_thread(_execute_signal, engine, loss_guard, signal, mode, live_engine)
-            except Exception as signal_err:
-                logger.error("Signal execution failed for %s: %s", signal.get("symbol"), signal_err)
-                _telemetry_increment("signal_exec_errors")
-                _safe_send_panic_alert(f"Signal execution failed for {signal.get('symbol')}: {signal_err}")
-            finally:
-                signal_queue.task_done()
-                _telemetry_record_event("signal_queue_depth", signal_queue.qsize())
+    def _handle_queue_overflow(symbol: str) -> None:
+        nonlocal last_queue_overflow_alert_at
+        now_ts = time.time()
+        if now_ts - last_queue_overflow_alert_at >= queue_overflow_alert_cooldown_seconds:
+            last_queue_overflow_alert_at = now_ts
+            _safe_send_panic_alert(
+                f"Signal queue overflow: dropping signals (latest symbol: {symbol}). Increase SIGNAL_QUEUE_MAXSIZE or reduce scan load."
+            )
+        _telemetry_record_event("signal_queue_depth", signal_queue.qsize())
 
     async def _run_rest_fallback_loop():
         logger.warning("Switching to REST polling fallback mode.")
@@ -404,8 +190,8 @@ async def run_bot_async(mode: str = "paper"):
         exchange = get_exchange(paper_mode=(mode == "paper"))
 
         fallback_day = date.today()
-        while True:
-            fallback_day = handle_daily_reset(engine, loss_guard, fallback_day)
+        while not _shutdown_event.is_set():
+            fallback_day = orchestrator_handle_daily_reset(engine, loss_guard, fallback_day)
             await _maybe_run_db_maintenance()
 
             allowed, reason = loss_guard.can_trade(
@@ -420,8 +206,8 @@ async def run_bot_async(mode: str = "paper"):
                 await asyncio.sleep(SCAN_INTERVAL_SECONDS)
                 continue
 
-            process_open_positions(exchange, engine, loss_guard, mode=mode, live_engine=live_engine)
-            scan_for_signals(
+            orchestrator_process_open_positions(exchange, engine, loss_guard, mode=mode, live_engine=live_engine)
+            orchestrator_scan_for_signals(
                 exchange,
                 engine,
                 loss_guard,
@@ -429,16 +215,17 @@ async def run_bot_async(mode: str = "paper"):
                 live_engine=live_engine,
                 signal_queue=signal_queue,
                 per_symbol_delay_seconds=REST_SYMBOL_DELAY_SECONDS,
+                on_queue_overflow=_handle_queue_overflow,
             )
             await asyncio.sleep(SCAN_INTERVAL_SECONDS)
 
     async def _run_rest_supplement_loop():
         if not rest_symbols:
             return
-        while True:
+        while not _shutdown_event.is_set():
             try:
-                process_open_positions(exchange, engine, loss_guard, mode=mode, live_engine=live_engine)
-                scan_for_signals(
+                orchestrator_process_open_positions(exchange, engine, loss_guard, mode=mode, live_engine=live_engine)
+                orchestrator_scan_for_signals(
                     exchange,
                     engine,
                     loss_guard,
@@ -447,6 +234,7 @@ async def run_bot_async(mode: str = "paper"):
                     symbols_to_scan=rest_symbols,
                     signal_queue=signal_queue,
                     per_symbol_delay_seconds=REST_SYMBOL_DELAY_SECONDS,
+                    on_queue_overflow=_handle_queue_overflow,
                 )
             except Exception as err:
                 logger.error("REST supplement loop error: %s", err)
@@ -471,19 +259,18 @@ async def run_bot_async(mode: str = "paper"):
             df = df.iloc[-MAX_CANDLE_CACHE_ROWS:].copy()
 
         candle_cache.setdefault(symbol, {})[timeframe] = df
-        today = handle_daily_reset(engine, loss_guard, today)
+        today = orchestrator_handle_daily_reset(engine, loss_guard, today)
         await _maybe_run_db_maintenance()
 
-        # Position management can happen on any candle close for that symbol.
         active_positions = live_engine.positions if (mode == "live" and live_engine is not None) else engine.positions
 
         if mode == "live" and live_engine is not None:
-            live_engine.reconcile_orders()
+            await asyncio.to_thread(live_engine.reconcile_orders)
 
         if symbol in active_positions:
             latest_close = float(df["close"].iloc[-1])
             if mode == "paper":
-                closed = engine.update_positions({symbol: latest_close})
+                closed = await asyncio.to_thread(engine.update_positions, {symbol: latest_close})
                 _telemetry_record_event("last_closed_count", len(closed))
                 for c in closed:
                     _safe_send_trade_closed(
@@ -492,7 +279,6 @@ async def run_bot_async(mode: str = "paper"):
                     )
                     loss_guard.record_trade(c["pnl"])
 
-        # Only trigger entry checks when the primary timeframe closes.
         if timeframe != PRIMARY_TIMEFRAME:
             return
 
@@ -541,8 +327,28 @@ async def run_bot_async(mode: str = "paper"):
             _telemetry_increment("symbols_skipped_volatility")
             return
 
-        signal = score_signal(primary.copy(), confirm.copy(), symbol)
-        if signal["send_alert"]:
+        daily_df = candle_cache.get(symbol, {}).get(DAILY_TIMEFRAME)
+
+        close_prices: dict[str, pd.Series] = {}
+        for open_sym in active_positions.keys():
+            open_primary = candle_cache.get(open_sym, {}).get(PRIMARY_TIMEFRAME)
+            if open_primary is not None and not open_primary.empty:
+                close_prices[open_sym] = open_primary["close"]
+        close_prices[symbol] = primary["close"]
+        if active_positions and len(close_prices) >= 2:
+            corr_matrix = compute_correlation_matrix(close_prices, lookback=30)
+            corr_ok, corr_reason = check_portfolio_correlation(
+                symbol,
+                list(active_positions.keys()),
+                corr_matrix,
+            )
+            if not corr_ok:
+                logger.warning("[%s] Correlation gate blocked entry: %s", symbol, corr_reason)
+                _telemetry_increment("symbols_skipped_correlation")
+                return
+
+        signal = score_signal(primary.copy(), confirm.copy(), symbol, df_daily=daily_df.copy() if daily_df is not None else None)
+        if signal["send_alert"] and should_emit_signal(signal):
             _telemetry_increment("alerts_sent")
             try:
                 signal_queue.put_nowait(signal)
@@ -550,17 +356,18 @@ async def run_bot_async(mode: str = "paper"):
             except asyncio.QueueFull:
                 logger.warning("Signal queue full; dropping signal for %s", symbol)
                 _telemetry_increment("signals_dropped_queue_full")
+                _handle_queue_overflow(symbol)
 
     try:
-        signal_worker_task = asyncio.create_task(_signal_worker())
+        signal_worker_task = asyncio.create_task(signal_worker_loop(signal_queue, engine, loss_guard, mode, live_engine=live_engine))
         await _maybe_run_db_maintenance()
         await ws_fetcher.connect()
         if rest_symbols:
             rest_task = asyncio.create_task(_run_rest_supplement_loop())
-        while True:
+        while not _shutdown_event.is_set():
             try:
                 await ws_fetcher.subscribe_klines(on_candle_close)
-                error_count = 0  # reset on success
+                error_count = 0
             except (ConnectionError, TimeoutError) as e:
                 error_count += 1
                 _telemetry_increment("api_errors")
@@ -582,6 +389,7 @@ async def run_bot_async(mode: str = "paper"):
         logger.info("Bot stopped by user.")
         _safe_send_daily_summary(engine.get_stats())
     finally:
+        logger.info("Shutting down gracefully...")
         if rest_task is not None:
             rest_task.cancel()
             try:
@@ -595,80 +403,14 @@ async def run_bot_async(mode: str = "paper"):
                 await signal_worker_task
 
         await ws_fetcher.close()
+        _safe_send_daily_summary(engine.get_stats())
+        logger.info("Bot shutdown complete.")
 
 
-def run_startup_health_gate(skip_health_gate: bool = False) -> bool:
-    if skip_health_gate:
-        logger.warning("Health gate skipped by --skip-health-gate flag.")
-        return True
-
-    project_root = Path(__file__).resolve().parents[1]
-    health_gate_script = project_root / "health_gate.py"
-    if not health_gate_script.exists():
-        logger.error("health_gate.py not found at %s", health_gate_script)
-        return False
-
-    logger.info("Running startup health gate...")
-    proc = subprocess.run([sys.executable, str(health_gate_script)], cwd=str(project_root))
-    if proc.returncode == 0:
-        logger.info("Startup health gate passed.")
-        return True
-
-    logger.error("Startup health gate failed (exit code %s). Bot start blocked.", proc.returncode)
-    return False
-
-
-def run_live_arming_check(mode: str) -> bool:
-    if mode != "live":
-        return True
-
-    if LIVE_CONFIRMATION_PHRASE == LIVE_CONFIRMATION_REQUIRED_VALUE:
-        logger.info("Live arming phrase verified. Live mode enabled.")
-        return True
-
-    logger.error(
-        "Live mode blocked: set LIVE_CONFIRMATION_PHRASE to the exact required value '%s' in .env",
-        LIVE_CONFIRMATION_REQUIRED_VALUE,
-    )
-    return False
-
-
-def run_live_exchange_readiness_check(mode: str) -> bool:
-    if mode != "live":
-        return True
-
-    logger.info("Running live exchange readiness check...")
-    if not BINANCE_API_KEY or not BINANCE_API_SECRET:
-        logger.error(
-            "Live mode blocked: BINANCE_API_KEY/BINANCE_API_SECRET missing. Set both in .env before starting live mode."
-        )
-        return False
-
-    try:
-        exchange = get_exchange(paper_mode=False)
-        balance = fetch_balance(exchange)
-        usdt_free = float((balance or {}).get("USDT_free") or 0.0)
-        if usdt_free <= 0:
-            logger.error("Live mode blocked: Binance USDT_free balance is 0 or unavailable.")
-            return False
-
-        missing_symbols = [s for s in WATCHLIST if s not in (exchange.markets or {})]
-        if missing_symbols:
-            logger.error("Live mode blocked: watchlist symbols missing on Binance: %s", ", ".join(missing_symbols))
-            return False
-
-        logger.info("Live readiness passed: USDT_free=%.4f and all watchlist symbols available.", usdt_free)
-        return True
-    except Exception as readiness_err:
-        msg = str(readiness_err)
-        if "-2015" in msg or "Invalid API-key" in msg or "permissions" in msg:
-            logger.error(
-                "Live mode blocked: Binance auth failed (%s). Verify API key/secret, required permissions, and IP whitelist.",
-                readiness_err,
-            )
-            return False
-        logger.error("Live mode blocked: readiness check failed: %s", readiness_err)
-        return False
+def _request_shutdown():
+    """Cross-platform shutdown handler."""
+    logger.info("Shutdown signal received.")
+    _shutdown_event.set()
 
 
 if __name__ == "__main__":
@@ -682,4 +424,17 @@ if __name__ == "__main__":
         raise SystemExit(1)
     if not run_startup_health_gate(skip_health_gate=cl_args.skip_health_gate):
         raise SystemExit(1)
-    asyncio.run(run_bot_async(mode=cl_args.mode))
+
+    # Register cross-platform shutdown (Windows-safe: no add_signal_handler)
+    if sys.platform != "win32":
+        import signal
+        loop = asyncio.new_event_loop()
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, _request_shutdown)
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(run_bot_async(mode=cl_args.mode))
+    else:
+        # On Windows, use threading to catch Ctrl+C
+        import signal
+        signal.signal(signal.SIGINT, lambda *_: _request_shutdown())
+        asyncio.run(run_bot_async(mode=cl_args.mode))

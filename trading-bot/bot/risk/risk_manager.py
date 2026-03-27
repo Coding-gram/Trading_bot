@@ -1,5 +1,5 @@
 """
-Risk Management – Stop Loss, Take Profit, Trailing SL, Position Sizing
+Risk Management – Stop Loss, Take Profit, Trailing SL, Position Sizing, Portfolio Heat
 All designed to protect capital and lock in profits.
 """
 import logging
@@ -7,8 +7,9 @@ import math
 from bot.config import (
     ATR_MULTIPLIER_SL, RR_RATIO,
     PARTIAL_TP1_RATIO, PARTIAL_TP2_RATIO,
-    TRAILING_SL_PCT, MAX_RISK_PER_TRADE_PCT,
+    MAX_RISK_PER_TRADE_PCT,
     MAX_CAPITAL_PER_TRADE_PCT, TOTAL_CAPITAL_USDT,
+    MAX_TOTAL_PORTFOLIO_RISK_PCT,
 )
 
 logger = logging.getLogger(__name__)
@@ -126,36 +127,47 @@ def calculate_take_profits(entry: float, stop_loss: float, direction: str, fib_l
     }
 
 
-# ─── Trailing Stop Loss ────────────────────────────────────────────────────────
+# ─── Trailing Stop Loss (ATR-based) ──────────────────────────────────────────
 
 class TrailingStopLoss:
     """
-    Tracks max favorable excursion and moves SL trail below it.
+    ATR-based trailing stop that adapts to current market volatility.
+    Falls back to a default offset if ATR is not available.
     Call update() on each new candle.
     """
 
-    def __init__(self, entry: float, initial_sl: float, direction: str):
+    DEFAULT_TRAIL_PCT = 0.015   # fallback if ATR unavailable
+
+    def __init__(self, entry: float, initial_sl: float, direction: str, atr: float = 0.0):
         self.direction = direction
         self.initial_sl = initial_sl
         self.current_sl = initial_sl
         self.best_price = entry
+        self.atr = max(atr, 0.0)
+
+    def _trail_offset(self, reference_price: float) -> float:
+        """Compute the trailing offset: ATR * 1.5, or fallback to fixed %."""
+        if self.atr > 0:
+            return self.atr * 1.5
+        return reference_price * self.DEFAULT_TRAIL_PCT
 
     def update(self, current_price: float) -> float:
         """Update trailing SL. Returns new SL."""
+        offset = self._trail_offset(current_price)
         if self.direction == "long":
             if current_price > self.best_price:
                 self.best_price = current_price
-                new_sl = self.best_price * (1 - TRAILING_SL_PCT)
+                new_sl = self.best_price - offset
                 if new_sl > self.current_sl:
                     self.current_sl = new_sl
-                    logger.debug("Trailing SL moved to %.4f", self.current_sl)
+                    logger.debug("Trailing SL moved to %.4f (ATR-based)", self.current_sl)
         else:
             if current_price < self.best_price:
                 self.best_price = current_price
-                new_sl = self.best_price * (1 + TRAILING_SL_PCT)
+                new_sl = self.best_price + offset
                 if new_sl < self.current_sl:
                     self.current_sl = new_sl
-                    logger.debug("Trailing SL moved to %.4f", self.current_sl)
+                    logger.debug("Trailing SL moved to %.4f (ATR-based)", self.current_sl)
         return self.current_sl
 
     def is_triggered(self, current_price: float) -> bool:
@@ -181,8 +193,10 @@ def calculate_position_size(
     Returns: {qty, usdt_risk, usdt_value, risk_pct}
     """
     risk_pct = MAX_RISK_PER_TRADE_PCT
+    cap_scale = 1.0
     if consecutive_losses >= 3:
         risk_pct = risk_pct / 2.0
+        cap_scale = 0.5
         logger.info("Throttling risk to %.2f%% due to %d consecutive losses", risk_pct * 100, consecutive_losses)
 
     risk_per_trade = capital * risk_pct     # e.g. 2% or 1% of capital
@@ -200,7 +214,7 @@ def calculate_position_size(
     qty_by_risk = risk_per_trade / sl_distance
 
     # Cap total trade value at MAX_CAPITAL_PER_TRADE_PCT
-    max_value = capital * MAX_CAPITAL_PER_TRADE_PCT
+    max_value = capital * MAX_CAPITAL_PER_TRADE_PCT * cap_scale
     qty_by_cap = max_value / entry
 
     # Use the smaller (safer) of both limits
@@ -220,6 +234,34 @@ def calculate_position_size(
         "usdt_risk": usdt_risk,
         "risk_pct": round(usdt_risk / capital * 100, 2),
     }
+
+
+# ─── Portfolio Heat Limit ─────────────────────────────────────────────────────
+
+def portfolio_heat_ok(positions: dict, capital: float) -> tuple[bool, float]:
+    """
+    Check if total portfolio risk (sum of all open position risks) is within limit.
+    Returns (allowed, current_heat_pct).
+    """
+    if capital <= 0:
+        return False, 0.0
+
+    total_risk = 0.0
+    for sym, trade in positions.items():
+        entry = float(trade.get("entry") or trade.get("entry_price") or 0)
+        sl = float(trade.get("sl") or trade.get("stop_loss") or 0)
+        qty = float(trade.get("qty") or 0)
+        if entry > 0 and sl > 0 and qty > 0:
+            total_risk += abs(entry - sl) * qty
+
+    heat_pct = total_risk / capital
+    allowed = heat_pct < MAX_TOTAL_PORTFOLIO_RISK_PCT
+    if not allowed:
+        logger.warning(
+            "Portfolio heat too high: %.2f%% >= %.2f%% limit. New entries blocked.",
+            heat_pct * 100, MAX_TOTAL_PORTFOLIO_RISK_PCT * 100,
+        )
+    return allowed, round(heat_pct * 100, 2)
 
 
 # ─── Daily Loss Guard ─────────────────────────────────────────────────────────

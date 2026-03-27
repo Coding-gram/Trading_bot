@@ -1,0 +1,942 @@
+{
+  "created_at_utc": "2026-03-27T14:28:30.367749+00:00",
+  "config": {
+    "symbols": [
+      "BTC/USDT",
+      "ETH/USDT",
+      "BNB/USDT",
+      "SOL/USDT",
+      "ADA/USDT",
+      "XRP/USDT",
+      "DOGE/USDT",
+      "AVAX/USDT",
+      "LINK/USDT",
+      "DOT/USDT",
+      "LTC/USDT",
+      "ATOM/USDT"
+    ],
+    "n_candles": 2200,
+    "folds": 5,
+    "mc_paths": 1200,
+    "seed": 42,
+    "signal_score_override": 56,
+    "trend_weight_mult": 1.0,
+    "macd_weight_mult": 1.0,
+    "penalty_weight_mult": 1.1
+  },
+  "symbols": {
+    "BTC/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": 9.13,
+            "sharpe": 1.0865,
+            "profit_factor": 2.6485,
+            "max_drawdown": 0.0055,
+            "win_rate": 66.67,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 8.38,
+            "sharpe": 0.8972,
+            "profit_factor": 2.0012,
+            "max_drawdown": 0.0063,
+            "win_rate": 62.5,
+            "trades": 8
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": 4.55,
+            "sharpe": 0.4977,
+            "profit_factor": 1.5239,
+            "max_drawdown": 0.0066,
+            "win_rate": 57.14,
+            "trades": 7
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": 7.66,
+            "sharpe": 0.9372,
+            "profit_factor": 2.3641,
+            "max_drawdown": 0.0035,
+            "win_rate": 66.67,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": 7.65,
+            "sharpe": 0.9366,
+            "profit_factor": 2.3628,
+            "max_drawdown": 0.0035,
+            "win_rate": 66.67,
+            "trades": 6
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": 0.871,
+        "avg_profit_factor": 2.1801,
+        "avg_max_drawdown": 0.0051,
+        "validation_trades": 33,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 33,
+        "p_loss": 0.0183,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 1037.5,
+        "p05_final_capital": 1007.93
+      }
+    },
+    "ETH/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": 2.48,
+            "sharpe": 0.1673,
+            "profit_factor": 1.1196,
+            "max_drawdown": 0.0163,
+            "win_rate": 41.67,
+            "trades": 12
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 6.68,
+            "sharpe": 0.4595,
+            "profit_factor": 1.4018,
+            "max_drawdown": 0.0163,
+            "win_rate": 50.0,
+            "trades": 10
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": 3.01,
+            "sharpe": 0.235,
+            "profit_factor": 1.2678,
+            "max_drawdown": 0.0112,
+            "win_rate": 50.0,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": -8.29,
+            "sharpe": -1.0119,
+            "profit_factor": 0.3966,
+            "max_drawdown": 0.0137,
+            "win_rate": 33.33,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": -9.08,
+            "sharpe": -1.7903,
+            "profit_factor": 0.133,
+            "max_drawdown": 0.0105,
+            "win_rate": 25.0,
+            "trades": 4
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": -0.3881,
+        "avg_profit_factor": 0.8638,
+        "avg_max_drawdown": 0.0136,
+        "validation_trades": 38,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 38,
+        "p_loss": 0.6217,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 992.83,
+        "p05_final_capital": 953.6
+      }
+    },
+    "BNB/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": -6.5,
+            "sharpe": -0.8279,
+            "profit_factor": 0.5354,
+            "max_drawdown": 0.0107,
+            "win_rate": 33.33,
+            "trades": 9
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 7.34,
+            "sharpe": 0.8611,
+            "profit_factor": 2.323,
+            "max_drawdown": 0.0055,
+            "win_rate": 66.67,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": 4.03,
+            "sharpe": 0.486,
+            "profit_factor": 1.7289,
+            "max_drawdown": 0.0055,
+            "win_rate": 60.0,
+            "trades": 5
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": 2.04,
+            "sharpe": 0.2699,
+            "profit_factor": 1.3456,
+            "max_drawdown": 0.0059,
+            "win_rate": 60.0,
+            "trades": 5
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": 5.58,
+            "sharpe": 0.9589,
+            "profit_factor": 3.7682,
+            "max_drawdown": 0.002,
+            "win_rate": 66.67,
+            "trades": 3
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": 0.3496,
+        "avg_profit_factor": 1.9402,
+        "avg_max_drawdown": 0.0059,
+        "validation_trades": 28,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 28,
+        "p_loss": 0.2417,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 1011.74,
+        "p05_final_capital": 985.75
+      }
+    },
+    "SOL/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": 15.51,
+            "sharpe": 1.0682,
+            "profit_factor": 2.5213,
+            "max_drawdown": 0.0078,
+            "win_rate": 57.14,
+            "trades": 7
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 15.51,
+            "sharpe": 1.0682,
+            "profit_factor": 2.5213,
+            "max_drawdown": 0.0078,
+            "win_rate": 57.14,
+            "trades": 7
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": -6.41,
+            "sharpe": -0.6892,
+            "profit_factor": 0.4533,
+            "max_drawdown": 0.0117,
+            "win_rate": 25.0,
+            "trades": 4
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": -3.11,
+            "sharpe": -0.3251,
+            "profit_factor": 0.6315,
+            "max_drawdown": 0.0084,
+            "win_rate": 33.33,
+            "trades": 3
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": -0.24,
+            "sharpe": -0.0281,
+            "profit_factor": 0.9579,
+            "max_drawdown": 0.0056,
+            "win_rate": 33.33,
+            "trades": 3
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": 0.2188,
+        "avg_profit_factor": 1.4171,
+        "avg_max_drawdown": 0.0083,
+        "validation_trades": 24,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 24,
+        "p_loss": 0.1875,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 1021.22,
+        "p05_final_capital": 981.71
+      }
+    },
+    "ADA/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": 0.03,
+            "sharpe": 0.0032,
+            "profit_factor": 1.0031,
+            "max_drawdown": 0.0049,
+            "win_rate": 33.33,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 1.58,
+            "sharpe": 0.1766,
+            "profit_factor": 1.2058,
+            "max_drawdown": 0.0045,
+            "win_rate": 40.0,
+            "trades": 5
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": 6.48,
+            "sharpe": 0.7946,
+            "profit_factor": 2.9957,
+            "max_drawdown": 0.0032,
+            "win_rate": 66.67,
+            "trades": 3
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": -3.86,
+            "sharpe": -0.4511,
+            "profit_factor": 0.5288,
+            "max_drawdown": 0.0082,
+            "win_rate": 33.33,
+            "trades": 3
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": -8.91,
+            "sharpe": -2.2082,
+            "profit_factor": 0.0,
+            "max_drawdown": 0.0089,
+            "win_rate": 0.0,
+            "trades": 3
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": -0.337,
+        "avg_profit_factor": 1.1467,
+        "avg_max_drawdown": 0.0059,
+        "validation_trades": 20,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 20,
+        "p_loss": 0.6083,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 995.82,
+        "p05_final_capital": 968.46
+      }
+    },
+    "XRP/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": -6.12,
+            "sharpe": -0.3647,
+            "profit_factor": 0.7669,
+            "max_drawdown": 0.0227,
+            "win_rate": 36.36,
+            "trades": 11
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": -6.12,
+            "sharpe": -0.3647,
+            "profit_factor": 0.7669,
+            "max_drawdown": 0.0227,
+            "win_rate": 36.36,
+            "trades": 11
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": -16.47,
+            "sharpe": -2.2321,
+            "profit_factor": 0.174,
+            "max_drawdown": 0.0168,
+            "win_rate": 25.0,
+            "trades": 8
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": -12.32,
+            "sharpe": -1.7446,
+            "profit_factor": 0.2204,
+            "max_drawdown": 0.0126,
+            "win_rate": 28.57,
+            "trades": 7
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": -12.26,
+            "sharpe": -2.9698,
+            "profit_factor": 0.0236,
+            "max_drawdown": 0.0126,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": -1.5352,
+        "avg_profit_factor": 0.3904,
+        "avg_max_drawdown": 0.0175,
+        "validation_trades": 42,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 42,
+        "p_loss": 0.9767,
+        "p_ruin_10pct": 0.0292,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 945.67,
+        "p05_final_capital": 905.12
+      }
+    },
+    "DOGE/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": -5.42,
+            "sharpe": -0.485,
+            "profit_factor": 0.63,
+            "max_drawdown": 0.0117,
+            "win_rate": 33.33,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": -17.88,
+            "sharpe": -2.5625,
+            "profit_factor": 0.1393,
+            "max_drawdown": 0.0208,
+            "win_rate": 12.5,
+            "trades": 8
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": 2.73,
+            "sharpe": 0.2222,
+            "profit_factor": 1.2919,
+            "max_drawdown": 0.0062,
+            "win_rate": 40.0,
+            "trades": 5
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": 1.1,
+            "sharpe": 0.2285,
+            "profit_factor": 1.5925,
+            "max_drawdown": 0.0019,
+            "win_rate": 50.0,
+            "trades": 2
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": 2.96,
+            "sharpe": 0.0,
+            "profit_factor": 999.0,
+            "max_drawdown": 0.0,
+            "win_rate": 100.0,
+            "trades": 1
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": -0.5194,
+        "avg_profit_factor": 200.5307,
+        "avg_max_drawdown": 0.0081,
+        "validation_trades": 22,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 22,
+        "p_loss": 0.8308,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 983.49,
+        "p05_final_capital": 955.78
+      }
+    },
+    "AVAX/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": 11.94,
+            "sharpe": 0.854,
+            "profit_factor": 1.7775,
+            "max_drawdown": 0.0112,
+            "win_rate": 41.67,
+            "trades": 12
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 14.44,
+            "sharpe": 1.0991,
+            "profit_factor": 2.1915,
+            "max_drawdown": 0.0096,
+            "win_rate": 50.0,
+            "trades": 10
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": 13.73,
+            "sharpe": 1.0014,
+            "profit_factor": 2.3655,
+            "max_drawdown": 0.0076,
+            "win_rate": 50.0,
+            "trades": 8
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": 6.18,
+            "sharpe": 0.6305,
+            "profit_factor": 1.7988,
+            "max_drawdown": 0.0054,
+            "win_rate": 50.0,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": 1.81,
+            "sharpe": 0.1989,
+            "profit_factor": 1.2342,
+            "max_drawdown": 0.0054,
+            "win_rate": 40.0,
+            "trades": 5
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": 0.7568,
+        "avg_profit_factor": 1.8735,
+        "avg_max_drawdown": 0.0078,
+        "validation_trades": 41,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 41,
+        "p_loss": 0.0317,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 1047.99,
+        "p05_final_capital": 1004.87
+      }
+    },
+    "LINK/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": 10.42,
+            "sharpe": 0.8023,
+            "profit_factor": 2.2151,
+            "max_drawdown": 0.0085,
+            "win_rate": 50.0,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 10.42,
+            "sharpe": 0.8023,
+            "profit_factor": 2.2151,
+            "max_drawdown": 0.0085,
+            "win_rate": 50.0,
+            "trades": 6
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": 7.21,
+            "sharpe": 0.5752,
+            "profit_factor": 2.0158,
+            "max_drawdown": 0.007,
+            "win_rate": 50.0,
+            "trades": 4
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": -1.34,
+            "sharpe": -0.1425,
+            "profit_factor": 0.8125,
+            "max_drawdown": 0.0072,
+            "win_rate": 33.33,
+            "trades": 3
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": 2.67,
+            "sharpe": 0.2962,
+            "profit_factor": 1.8417,
+            "max_drawdown": 0.0032,
+            "win_rate": 50.0,
+            "trades": 2
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": 0.4667,
+        "avg_profit_factor": 1.82,
+        "avg_max_drawdown": 0.0069,
+        "validation_trades": 21,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 21,
+        "p_loss": 0.1008,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 1028.9,
+        "p05_final_capital": 991.71
+      }
+    },
+    "DOT/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": 21.18,
+            "sharpe": 1.1045,
+            "profit_factor": 2.2541,
+            "max_drawdown": 0.0095,
+            "win_rate": 50.0,
+            "trades": 10
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 12.92,
+            "sharpe": 0.7054,
+            "profit_factor": 1.7398,
+            "max_drawdown": 0.0095,
+            "win_rate": 40.0,
+            "trades": 10
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": 20.31,
+            "sharpe": 1.2183,
+            "profit_factor": 2.9734,
+            "max_drawdown": 0.0075,
+            "win_rate": 50.0,
+            "trades": 8
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": 26.01,
+            "sharpe": 1.654,
+            "profit_factor": 4.2731,
+            "max_drawdown": 0.0074,
+            "win_rate": 62.5,
+            "trades": 8
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": 9.5,
+            "sharpe": 0.6681,
+            "profit_factor": 2.2655,
+            "max_drawdown": 0.0075,
+            "win_rate": 50.0,
+            "trades": 4
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": 1.0701,
+        "avg_profit_factor": 2.7012,
+        "avg_max_drawdown": 0.0083,
+        "validation_trades": 40,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 40,
+        "p_loss": 0.0042,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 1088.66,
+        "p05_final_capital": 1033.34
+      }
+    },
+    "LTC/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": 8.27,
+            "sharpe": 0.7075,
+            "profit_factor": 1.7759,
+            "max_drawdown": 0.0054,
+            "win_rate": 50.0,
+            "trades": 8
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": 8.27,
+            "sharpe": 0.7076,
+            "profit_factor": 1.7759,
+            "max_drawdown": 0.0054,
+            "win_rate": 50.0,
+            "trades": 8
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": -9.21,
+            "sharpe": -1.3334,
+            "profit_factor": 0.3234,
+            "max_drawdown": 0.0118,
+            "win_rate": 14.29,
+            "trades": 7
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": -4.13,
+            "sharpe": -0.6245,
+            "profit_factor": 0.5172,
+            "max_drawdown": 0.0068,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": -4.36,
+            "sharpe": -0.6525,
+            "profit_factor": 0.5035,
+            "max_drawdown": 0.007,
+            "win_rate": 20.0,
+            "trades": 5
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": -0.2391,
+        "avg_profit_factor": 0.9792,
+        "avg_max_drawdown": 0.0073,
+        "validation_trades": 33,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 33,
+        "p_loss": 0.5442,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 997.75,
+        "p05_final_capital": 967.74
+      }
+    },
+    "ATOM/USDT": {
+      "folds": [
+        {
+          "split_ratio": 0.55,
+          "metrics": {
+            "total_pnl": -1.48,
+            "sharpe": -0.1347,
+            "profit_factor": 0.8467,
+            "max_drawdown": 0.0096,
+            "win_rate": 40.0,
+            "trades": 5
+          }
+        },
+        {
+          "split_ratio": 0.613,
+          "metrics": {
+            "total_pnl": -1.48,
+            "sharpe": -0.1347,
+            "profit_factor": 0.8467,
+            "max_drawdown": 0.0096,
+            "win_rate": 40.0,
+            "trades": 5
+          }
+        },
+        {
+          "split_ratio": 0.675,
+          "metrics": {
+            "total_pnl": -1.52,
+            "sharpe": -0.138,
+            "profit_factor": 0.8433,
+            "max_drawdown": 0.0096,
+            "win_rate": 40.0,
+            "trades": 5
+          }
+        },
+        {
+          "split_ratio": 0.738,
+          "metrics": {
+            "total_pnl": -5.48,
+            "sharpe": -1.8679,
+            "profit_factor": 0.0213,
+            "max_drawdown": 0.0056,
+            "win_rate": 33.33,
+            "trades": 3
+          }
+        },
+        {
+          "split_ratio": 0.8,
+          "metrics": {
+            "total_pnl": -2.55,
+            "sharpe": -0.9145,
+            "profit_factor": 0.0446,
+            "max_drawdown": 0.0027,
+            "win_rate": 50.0,
+            "trades": 2
+          }
+        }
+      ],
+      "aggregate": {
+        "avg_sharpe": -0.638,
+        "avg_profit_factor": 0.5205,
+        "avg_max_drawdown": 0.0074,
+        "validation_trades": 20,
+        "warning": ""
+      },
+      "monte_carlo": {
+        "paths": 1200,
+        "trades_per_path": 20,
+        "p_loss": 0.7542,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 987.03,
+        "p05_final_capital": 960.23
+      }
+    }
+  },
+  "portfolio_summary": {
+    "validation_trades_total": 362,
+    "warning": "",
+    "monte_carlo": {
+      "paths": 1200,
+      "trades_per_path": 362,
+      "p_loss": 0.0317,
+      "p_ruin_10pct": 0.0,
+      "p_drawdown_20pct": 0.0,
+      "median_final_capital": 1148.52,
+      "p05_final_capital": 1017.03
+    }
+  }
+}

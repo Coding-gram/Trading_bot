@@ -1,0 +1,598 @@
+{
+  "created_at_utc": "2026-03-25T11:37:23.259781+00:00",
+  "config": {
+    "symbols": [
+      "BTC/USDT",
+      "ETH/USDT",
+      "BNB/USDT",
+      "SOL/USDT"
+    ],
+    "n_candles": 900,
+    "folds": 2,
+    "mc_paths": 500,
+    "seed": 42,
+    "score_grid": [
+      52,
+      56
+    ],
+    "trend_mults": [
+      1.0,
+      1.1
+    ],
+    "macd_mults": [
+      1.0,
+      1.1
+    ],
+    "penalty_mults": [
+      1.0,
+      1.1
+    ],
+    "total_candidates": 16
+  },
+  "best": {
+    "candidate": {
+      "min_signal_score": 56,
+      "trend_mult": 1.0,
+      "macd_mult": 1.0,
+      "penalty_mult": 1.1
+    },
+    "objective": 18.7982,
+    "portfolio": {
+      "validation_trades_total": 10,
+      "avg_profit_factor": 0.3564,
+      "avg_sharpe": -1.0254,
+      "avg_max_drawdown": 0.0031,
+      "monte_carlo": {
+        "paths": 500,
+        "trades_per_path": 10,
+        "p_loss": 0.856,
+        "p_ruin_10pct": 0.0,
+        "p_drawdown_20pct": 0.0,
+        "median_final_capital": 986.2,
+        "p05_final_capital": 967.82
+      }
+    },
+    "symbols": {
+      "BTC/USDT": {
+        "aggregate": {
+          "avg_sharpe": -0.1032,
+          "avg_profit_factor": 0.3288,
+          "avg_max_drawdown": 0.0016,
+          "validation_trades": 2
+        },
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 2,
+          "p_loss": 0.772,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 998.91,
+          "p05_final_capital": 993.64
+        }
+      },
+      "ETH/USDT": {
+        "aggregate": {
+          "avg_sharpe": -3.733,
+          "avg_profit_factor": 0.0,
+          "avg_max_drawdown": 0.0056,
+          "validation_trades": 3
+        },
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 3,
+          "p_loss": 1.0,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 988.85,
+          "p05_final_capital": 987.2
+        }
+      },
+      "BNB/USDT": {
+        "aggregate": {
+          "avg_sharpe": -0.4188,
+          "avg_profit_factor": 0.1548,
+          "avg_max_drawdown": 0.0033,
+          "validation_trades": 3
+        },
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 3,
+          "p_loss": 0.738,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 995.41,
+          "p05_final_capital": 989.44
+        }
+      },
+      "SOL/USDT": {
+        "aggregate": {
+          "avg_sharpe": 0.1532,
+          "avg_profit_factor": 0.9418,
+          "avg_max_drawdown": 0.0019,
+          "validation_trades": 2
+        },
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 2,
+          "p_loss": 0.228,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 1003.43,
+          "p05_final_capital": 992.24
+        }
+      }
+    }
+  },
+  "top5": [
+    {
+      "candidate": {
+        "min_signal_score": 56,
+        "trend_mult": 1.0,
+        "macd_mult": 1.0,
+        "penalty_mult": 1.1
+      },
+      "objective": 18.7982,
+      "portfolio": {
+        "validation_trades_total": 10,
+        "avg_profit_factor": 0.3564,
+        "avg_sharpe": -1.0254,
+        "avg_max_drawdown": 0.0031,
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 10,
+          "p_loss": 0.856,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 986.2,
+          "p05_final_capital": 967.82
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.1032,
+            "avg_profit_factor": 0.3288,
+            "avg_max_drawdown": 0.0016,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 2,
+            "p_loss": 0.772,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 998.91,
+            "p05_final_capital": 993.64
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": -3.733,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0056,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 988.85,
+            "p05_final_capital": 987.2
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.4188,
+            "avg_profit_factor": 0.1548,
+            "avg_max_drawdown": 0.0033,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 0.738,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 995.41,
+            "p05_final_capital": 989.44
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1532,
+            "avg_profit_factor": 0.9418,
+            "avg_max_drawdown": 0.0019,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 2,
+            "p_loss": 0.228,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1003.43,
+            "p05_final_capital": 992.24
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "min_signal_score": 56,
+        "trend_mult": 1.0,
+        "macd_mult": 1.1,
+        "penalty_mult": 1.1
+      },
+      "objective": 18.7982,
+      "portfolio": {
+        "validation_trades_total": 10,
+        "avg_profit_factor": 0.3564,
+        "avg_sharpe": -1.0254,
+        "avg_max_drawdown": 0.0031,
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 10,
+          "p_loss": 0.856,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 986.2,
+          "p05_final_capital": 967.82
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.1032,
+            "avg_profit_factor": 0.3288,
+            "avg_max_drawdown": 0.0016,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 2,
+            "p_loss": 0.772,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 998.91,
+            "p05_final_capital": 993.64
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": -3.733,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0056,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 988.85,
+            "p05_final_capital": 987.2
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.4188,
+            "avg_profit_factor": 0.1548,
+            "avg_max_drawdown": 0.0033,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 0.738,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 995.41,
+            "p05_final_capital": 989.44
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1532,
+            "avg_profit_factor": 0.9418,
+            "avg_max_drawdown": 0.0019,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 2,
+            "p_loss": 0.228,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1003.43,
+            "p05_final_capital": 992.24
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "min_signal_score": 56,
+        "trend_mult": 1.1,
+        "macd_mult": 1.0,
+        "penalty_mult": 1.1
+      },
+      "objective": 18.7982,
+      "portfolio": {
+        "validation_trades_total": 10,
+        "avg_profit_factor": 0.3564,
+        "avg_sharpe": -1.0254,
+        "avg_max_drawdown": 0.0031,
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 10,
+          "p_loss": 0.856,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 986.2,
+          "p05_final_capital": 967.82
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.1032,
+            "avg_profit_factor": 0.3288,
+            "avg_max_drawdown": 0.0016,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 2,
+            "p_loss": 0.772,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 998.91,
+            "p05_final_capital": 993.64
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": -3.733,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0056,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 988.85,
+            "p05_final_capital": 987.2
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.4188,
+            "avg_profit_factor": 0.1548,
+            "avg_max_drawdown": 0.0033,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 0.738,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 995.41,
+            "p05_final_capital": 989.44
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1532,
+            "avg_profit_factor": 0.9418,
+            "avg_max_drawdown": 0.0019,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 2,
+            "p_loss": 0.228,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1003.43,
+            "p05_final_capital": 992.24
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "min_signal_score": 52,
+        "trend_mult": 1.0,
+        "macd_mult": 1.0,
+        "penalty_mult": 1.0
+      },
+      "objective": 17.5907,
+      "portfolio": {
+        "validation_trades_total": 11,
+        "avg_profit_factor": 0.317,
+        "avg_sharpe": -1.0887,
+        "avg_max_drawdown": 0.0034,
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 11,
+          "p_loss": 0.896,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 983.97,
+          "p05_final_capital": 966.1
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.3711,
+            "avg_profit_factor": 0.1797,
+            "avg_max_drawdown": 0.0029,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 0.738,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 996.27,
+            "p05_final_capital": 991.0
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": -3.733,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0056,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 988.85,
+            "p05_final_capital": 987.2
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.3995,
+            "avg_profit_factor": 0.1654,
+            "avg_max_drawdown": 0.0031,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 0.738,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 995.84,
+            "p05_final_capital": 990.29
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1487,
+            "avg_profit_factor": 0.9231,
+            "avg_max_drawdown": 0.002,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 2,
+            "p_loss": 0.228,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1003.35,
+            "p05_final_capital": 992.08
+          }
+        }
+      }
+    },
+    {
+      "candidate": {
+        "min_signal_score": 52,
+        "trend_mult": 1.0,
+        "macd_mult": 1.1,
+        "penalty_mult": 1.0
+      },
+      "objective": 17.5907,
+      "portfolio": {
+        "validation_trades_total": 11,
+        "avg_profit_factor": 0.317,
+        "avg_sharpe": -1.0887,
+        "avg_max_drawdown": 0.0034,
+        "monte_carlo": {
+          "paths": 500,
+          "trades_per_path": 11,
+          "p_loss": 0.896,
+          "p_ruin_10pct": 0.0,
+          "p_drawdown_20pct": 0.0,
+          "median_final_capital": 983.97,
+          "p05_final_capital": 966.1
+        }
+      },
+      "symbols": {
+        "BTC/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.3711,
+            "avg_profit_factor": 0.1797,
+            "avg_max_drawdown": 0.0029,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 0.738,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 996.27,
+            "p05_final_capital": 991.0
+          }
+        },
+        "ETH/USDT": {
+          "aggregate": {
+            "avg_sharpe": -3.733,
+            "avg_profit_factor": 0.0,
+            "avg_max_drawdown": 0.0056,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 1.0,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 988.85,
+            "p05_final_capital": 987.2
+          }
+        },
+        "BNB/USDT": {
+          "aggregate": {
+            "avg_sharpe": -0.3995,
+            "avg_profit_factor": 0.1654,
+            "avg_max_drawdown": 0.0031,
+            "validation_trades": 3
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 3,
+            "p_loss": 0.738,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 995.84,
+            "p05_final_capital": 990.29
+          }
+        },
+        "SOL/USDT": {
+          "aggregate": {
+            "avg_sharpe": 0.1487,
+            "avg_profit_factor": 0.9231,
+            "avg_max_drawdown": 0.002,
+            "validation_trades": 2
+          },
+          "monte_carlo": {
+            "paths": 500,
+            "trades_per_path": 2,
+            "p_loss": 0.228,
+            "p_ruin_10pct": 0.0,
+            "p_drawdown_20pct": 0.0,
+            "median_final_capital": 1003.35,
+            "p05_final_capital": 992.08
+          }
+        }
+      }
+    }
+  ]
+}

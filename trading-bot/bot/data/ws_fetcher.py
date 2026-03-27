@@ -6,7 +6,13 @@ import asyncio
 import logging
 import random
 import ccxt.pro
-from bot.config import BINANCE_API_KEY, BINANCE_API_SECRET, EXCHANGE_ID
+from bot.config import (
+    BINANCE_API_KEY,
+    BINANCE_API_SECRET,
+    EXCHANGE_ID,
+    WS_WATCHDOG_TIMEOUT_SECONDS,
+    WS_WATCHDOG_MAX_TIMEOUTS,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +25,7 @@ class WebSocketFetcher:
         self._running = False
         self._last_closed_ts = {}
         self._error_counts = {}
+        self._stall_counts = {}
 
     @staticmethod
     def _is_time_sync_error(err: Exception) -> bool:
@@ -36,7 +43,7 @@ class WebSocketFetcher:
         return (
             "-2015" in msg
             or "invalid api-key" in msg
-            or "api-key" in msg and "permissions" in msg
+            or ("api-key" in msg and "permissions" in msg)
             or "authentication" in msg
         )
 
@@ -104,7 +111,11 @@ class WebSocketFetcher:
         key = (symbol, timeframe)
         while self._running:
             try:
-                ohlcv = await self.exchange.watch_ohlcv(symbol, timeframe)
+                ohlcv = await asyncio.wait_for(
+                    self.exchange.watch_ohlcv(symbol, timeframe),
+                    timeout=max(15, WS_WATCHDOG_TIMEOUT_SECONDS),
+                )
+                self._stall_counts[key] = 0
                 if not ohlcv:
                     continue
 
@@ -132,6 +143,24 @@ class WebSocketFetcher:
                 await on_candle_close(symbol, timeframe, closed_payload)
             except asyncio.CancelledError:
                 return
+            except asyncio.TimeoutError:
+                self._stall_counts[key] = self._stall_counts.get(key, 0) + 1
+                timeout_count = self._stall_counts[key]
+                logger.warning(
+                    "WebSocket stalled for %s %s (timeout %d/%d, %ss)",
+                    symbol,
+                    timeframe,
+                    timeout_count,
+                    WS_WATCHDOG_MAX_TIMEOUTS,
+                    max(15, WS_WATCHDOG_TIMEOUT_SECONDS),
+                )
+                if timeout_count >= max(1, WS_WATCHDOG_MAX_TIMEOUTS):
+                    self._running = False
+                    raise ConnectionError(
+                        f"WebSocket stalled for {symbol} {timeframe} after {timeout_count} consecutive timeouts"
+                    )
+                await asyncio.sleep(1)
+                continue
             except Exception as e:
                 if self._is_auth_error(e):
                     self._running = False

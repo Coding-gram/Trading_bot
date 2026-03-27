@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Head from 'next/head';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
@@ -12,10 +12,10 @@ function useFetch(url, interval = 15000) {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(() => {
-    fetch(url)
+    fetch(url, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false); })
-      .catch(() => setLoading(false));
+      .catch(() => { setData(null); setLoading(false); });
   }, [url]);
 
   useEffect(() => {
@@ -63,6 +63,13 @@ function fmtPnl(v) {
   return `${n >= 0 ? '+' : ''}$${n.toFixed(2)}`;
 }
 
+function fmtDateTime(v) {
+  if (!v) return '—';
+  const d = new Date(v);
+  if (Number.isNaN(d.getTime())) return String(v);
+  return d.toLocaleString();
+}
+
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -76,11 +83,15 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 export default function Home() {
-  const { data: stats }  = useFetch(`${API}/api/stats`, 15000);
-  const { data: trades } = useFetch(`${API}/api/trades`, 15000);
-  const { data: open }   = useFetch(`${API}/api/open`, 8000);
-  const { data: curve }  = useFetch(`${API}/api/pnl-curve`, 30000);
-  const { data: quality } = useFetch(`${API}/api/quality`, 30000);
+  const [dashboardMode, setDashboardMode] = useState('paper');
+  const modeQuery = `mode=${dashboardMode}`;
+  const { data: stats }  = useFetch(`${API}/api/stats?${modeQuery}`, 15000);
+  const { data: trades } = useFetch(`${API}/api/trades?limit=200&${modeQuery}`, 15000);
+  const { data: open }   = useFetch(`${API}/api/open?${modeQuery}`, 8000);
+  const { data: curve }  = useFetch(`${API}/api/pnl-curve?${modeQuery}`, 30000);
+  const { data: quality } = useFetch(`${API}/api/quality?${modeQuery}`, 30000);
+  const { data: runtime } = useFetch(`${API}/api/runtime`, 8000);
+  const { data: weightFeedback } = useFetch(`${API}/api/weight-feedback`, 30000);
   const [now, setNow]    = useState('');
 
   useEffect(() => {
@@ -92,6 +103,18 @@ export default function Home() {
 
   const pnlColor = stats?.total_pnl >= 0 ? 'green' : 'red';
   const wrColor  = (stats?.win_rate ?? 0) >= 60 ? 'green' : 'red';
+  const runtimeHealthScore = Number(runtime?.health?.score ?? 0);
+  const runtimeHealthColor = runtimeHealthScore >= 80 ? 'green' : runtimeHealthScore >= 60 ? 'blue' : 'red';
+  const apiErrorRate = Number(runtime?.health?.api_error_rate_pct ?? 0);
+  const rejectRate = Number(runtime?.health?.order_reject_rate_pct ?? 0);
+  const queueDrops = Number(runtime?.health?.signals_dropped_queue_full ?? 0);
+  const filteredTrades = useMemo(() => trades || [], [trades]);
+  const feedbackEnabled = Boolean(weightFeedback?.enabled);
+  const feedbackHasReport = Boolean(weightFeedback?.has_report);
+  const feedbackChanges = Number(weightFeedback?.changed_weights ?? 0);
+  const feedbackClosedTrades = Number(weightFeedback?.closed_trades ?? weightFeedback?.last_auto_adjust_closed_count ?? 0);
+  const feedbackColor = !feedbackEnabled ? 'red' : (feedbackHasReport ? 'green' : 'blue');
+  const lastFeedbackAt = fmtDateTime(weightFeedback?.generated_at || weightFeedback?.meta_updated_at);
 
   return (
     <>
@@ -106,7 +129,33 @@ export default function Home() {
           <div className="dot" />
           TradingBot · Binance
         </div>
-        <div className="nav-status">⚡ Paper Mode Active</div>
+        <div style={{ display: 'inline-flex', gap: 8 }}>
+          {['paper', 'live'].map((mode) => {
+            const active = dashboardMode === mode;
+            return (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => setDashboardMode(mode)}
+                style={{
+                  border: `1px solid ${active ? 'var(--accent-blue)' : 'var(--border)'}`,
+                  background: active ? 'rgba(96,165,250,0.16)' : 'rgba(99,179,237,0.04)',
+                  color: active ? 'var(--accent-blue)' : 'var(--text-secondary)',
+                  borderRadius: 999,
+                  padding: '6px 14px',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.6,
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                }}
+              >
+                {mode}
+              </button>
+            );
+          })}
+        </div>
+        <div className="nav-status">⚡ {dashboardMode === 'paper' ? 'Paper' : 'Live'} Mode</div>
         <span className="refresh-time">Live · {now}</span>
       </nav>
 
@@ -114,10 +163,10 @@ export default function Home() {
 
         {/* ── Stats Row ── */}
         <div className="grid grid-4">
-          <StatCard label="Total Trades"  value={stats?.total ?? '—'}             color="blue" />
+          <StatCard label="Total Trades"  value={stats?.total ?? '—'}             color="blue" sub={`${dashboardMode.toUpperCase()} only`} />
           <StatCard label="Win Rate"      value={`${stats?.win_rate ?? '—'}%`}    color={wrColor}  sub={`${stats?.wins ?? 0}W / ${stats?.losses ?? 0}L`} />
           <StatCard label="Total PnL"     value={`${stats?.total_pnl >= 0 ? '+' : ''}${stats?.total_pnl?.toFixed(2) ?? '—'}`} prefix="$" color={pnlColor} />
-          <StatCard label="Open Positions" value={open?.length ?? '—'}             color="blue" sub={`Paper ${stats?.paper_total ?? 0} · Live ${stats?.live_total ?? 0}`} />
+          <StatCard label="Open Positions" value={open?.length ?? '—'}             color="blue" sub={`${dashboardMode.toUpperCase()} only`} />
         </div>
 
         <div className="grid grid-4">
@@ -125,6 +174,20 @@ export default function Home() {
           <StatCard label="Max Drawdown" value={`${quality?.max_drawdown_pct ?? '—'}%`} color={(quality?.max_drawdown_pct ?? 0) <= 10 ? 'green' : 'red'} />
           <StatCard label="Expectancy" value={`${quality?.expectancy_per_trade >= 0 ? '+' : ''}${quality?.expectancy_per_trade ?? '—'}`} prefix="$" color={(quality?.expectancy_per_trade ?? 0) >= 0 ? 'green' : 'red'} sub="Per closed trade" />
           <StatCard label="High-Conf Precision" value={`${quality?.high_conf_precision_pct ?? '—'}%`} color={(quality?.high_conf_precision_pct ?? 0) >= 60 ? 'green' : 'red'} sub="Score ≥ 70" />
+        </div>
+
+        <div className="grid grid-4">
+          <StatCard label="Runtime Health" value={`${runtimeHealthScore || '—'}/100`} color={runtimeHealthColor} sub="Telemetry-derived" />
+          <StatCard label="API Error Rate" value={`${apiErrorRate.toFixed(2)}%`} color={apiErrorRate <= 2 ? 'green' : 'red'} sub="Per scan session" />
+          <StatCard label="Order Reject Rate" value={`${rejectRate.toFixed(2)}%`} color={rejectRate <= 20 ? 'green' : 'red'} sub="Opened + rejected" />
+          <StatCard label="Queue Drops" value={queueDrops} color={queueDrops === 0 ? 'green' : 'red'} sub="Signal queue overflow" />
+        </div>
+
+        <div className="grid grid-4">
+          <StatCard label="Weight Feedback" value={feedbackEnabled ? (feedbackHasReport ? 'ACTIVE' : 'WAITING') : 'OFF'} color={feedbackColor} sub={feedbackEnabled ? 'Auto-adjust enabled' : 'Disabled in config'} />
+          <StatCard label="Last Recalibration" value={lastFeedbackAt} color={feedbackHasReport ? 'green' : 'blue'} sub="Most recent auto-adjust pass" />
+          <StatCard label="Closed Trades @ Run" value={feedbackClosedTrades} color={feedbackHasReport ? 'green' : 'blue'} sub="Samples used at last run" />
+          <StatCard label="Weights Changed" value={feedbackChanges} color={feedbackChanges > 0 ? 'green' : 'blue'} sub="Updated in latest run" />
         </div>
 
         {/* ── PnL Curve ── */}
@@ -152,7 +215,7 @@ export default function Home() {
             </ResponsiveContainer>
           ) : (
             <div style={{ height: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-              No closed trades yet. Running paper scan…
+              No closed trades yet for {dashboardMode.toUpperCase()} mode.
             </div>
           )}
         </div>
@@ -196,16 +259,16 @@ export default function Home() {
         <div className="card">
           <div className="section-title">Trade History</div>
           <div className="table-wrap">
-            {trades?.length ? (
+            {filteredTrades.length ? (
               <table>
                 <thead>
                   <tr>
                     <th>Mode</th><th>Symbol</th><th>Dir</th><th>Entry</th>
-                    <th>Exit</th><th>PnL</th><th>Reason</th>
+                    <th>Exit</th><th>PnL</th><th>Closed At</th><th>Reason</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {trades.slice(0, 20).map(t => (
+                  {filteredTrades.slice(0, 20).map(t => (
                     <tr key={t.id}>
                       <td><span className="badge badge-open">{(t.mode || 'paper').toUpperCase()}</span></td>
                       <td>{t.symbol}</td>
@@ -215,6 +278,7 @@ export default function Home() {
                       <td className={Number(t.pnl) >= 0 ? 'mono pnl-pos' : 'mono pnl-neg'}>
                         {fmtPnl(t.pnl)}
                       </td>
+                      <td className="mono">{fmtDateTime(t.close_time || t.open_time)}</td>
                       <td style={{ fontSize: 11, color: 'var(--text-muted)' }}>
                         {(t.reason || t.status || '').replace(/_/g, ' ')}
                       </td>
@@ -224,7 +288,7 @@ export default function Home() {
               </table>
             ) : (
               <div style={{ color: 'var(--text-muted)', fontSize: 13, textAlign: 'center', padding: '40px 0' }}>
-                No trades yet. Bot is scanning markets…
+                No trades yet for {dashboardMode.toUpperCase()} mode. Bot is scanning markets…
               </div>
             )}
           </div>
